@@ -1,0 +1,129 @@
+﻿@using MediatR
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using QuantumSummerLab.Application.Teams.Commands
+@using QuantumSummerLab.Web.Helpers
+
+@inject NavigationManager NavigationManager
+@inject NavigationHelper NavigationHelper
+@inject ProtectedLocalStorage ProtectedLocalStore
+@inject IMediator Mediator
+
+@page "/login"
+
+<PageTitle>Quantum Summer Lab - Login</PageTitle>
+
+<MudText Typo="Typo.h4" Class="my-4">@(IsLoggedIn ? "Logout" : "Login")</MudText>
+
+@if (!IsLoggedIn)
+{
+    <MudContainer Class="d-flex justify-center flex-grow-1 gap-4">
+        <MudCard Elevation="5">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Login or create team account</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Login or create team account</MudText>
+                <MudText Typo="Typo.body2">Using this form, you can login using your existing team account or create a new team account.</MudText>
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <MudAlert Severity="Severity.Error" Class="my-2">@ErrorMessage</MudAlert>
+                }
+                <MudTextField @bind-Value="TeamName" Class="my-4" Label="Team name" spellcheck="false" Variant="Variant.Text" OnKeyUp="@OnKeyUp"></MudTextField>
+                <MudTextField @bind-Value="Password" Class="my-4" Label="Password" spellcheck="false" InputType="InputType.Password" Variant="Variant.Text" OnKeyUp="@OnKeyUp"></MudTextField>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Success" OnClick="@Authenticate" Class="ml-2 mb-2 mr-2">Login</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.GroupAdd" Color="Color.Primary" OnClick="@Register" Class="ml-2 mb-2">Register</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudContainer>
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.ExtraSmall" Class="d-flex flex-column justify-center gap-4">
+        <MudAlert Severity="Severity.Info" Class="my-4">You are logged in as '@LoggedInTeamName'</MudAlert>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Logout" Color="Color.Error" OnClick="@Logout">Logout</MudButton>
+    </MudContainer>
+}
+
+@code {
+
+    private int currentCount = 0;
+
+    private bool IsLoggedIn { get; set; }
+    private string LoggedInTeamName { get; set; }
+    private string ErrorMessage { get; set; } = string.Empty;
+    private string TeamName { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authentication = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
+            IsLoggedIn = authentication.Success;
+            LoggedInTeamName = authentication.Value?.TeamName ?? string.Empty;
+
+            StateHasChanged();
+        }
+    }
+
+    protected async Task Authenticate()
+    {
+        var response = await Mediator.Send(new LoginCommand
+        {
+            TeamName = TeamName,
+            Password = Password
+        });
+
+        if (response.Success)
+        {
+            await ProtectedLocalStore.SetAsync("authToken", response.Token);
+            NavigationHelper.Update();
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            ErrorMessage = response.ErrorMessage;
+            StateHasChanged();
+        }
+    }
+
+    protected async Task Register()
+    {
+        var response = await Mediator.Send(new RegisterCommand
+        {
+            TeamName = TeamName,
+            Password = Password
+        });
+
+        if (response.Success)
+        {
+            await ProtectedLocalStore.SetAsync("authToken", response.Token);
+            NavigationHelper.Update();
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            ErrorMessage = response.ErrorMessage;
+            StateHasChanged();
+        }
+    }
+
+    protected async Task Logout()
+    {
+        await ProtectedLocalStore.DeleteAsync("authToken");
+        NavigationHelper.Update();
+        NavigationManager.NavigateTo("/");
+    }
+
+    protected async Task OnKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await Authenticate();
+        }
+    }
+}

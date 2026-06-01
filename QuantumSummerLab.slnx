@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/0. QSharpBridge/">
+    <Project Path="QSharp.Community.QSharpBridge/QSharp.Community.QSharpBridge.csproj" />
+  </Folder>
+  <Folder Name="/1. Application/">
+    <Project Path="QuantumSummerLab.Application/QuantumSummerLab.Application.csproj" />
+  </Folder>
+  <Folder Name="/2. Data/">
+    <Project Path="QuantumSummerLab.Data/QuantumSummerLab.Data.csproj" />
+  </Folder>
+  <Folder Name="/3. UX/">
+    <Project Path="QuantumSummerLab.Admin/QuantumSummerLab.Admin.csproj" />
+    <Project Path="QuantumSummerLab.Copilot/QuantumSummerLab.Copilot.csproj" />
+    <Project Path="QuantumSummerLab.Processor/QuantumSummerLab.Processor.csproj" />
+    <Project Path="QuantumSummerLab.Web/QuantumSummerLab.Web.csproj" />
+  </Folder>
+  <Folder Name="/4. Tools/">
+    <Project Path="QuantumSummerLab.Tools/QuantumSummerLab.Tools.csproj" />
+  </Folder>
+</Solution>

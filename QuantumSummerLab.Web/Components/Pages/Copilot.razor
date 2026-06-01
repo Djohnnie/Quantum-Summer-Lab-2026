@@ -1,0 +1,65 @@
+﻿@using MediatR
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using QuantumSummerLab.Application.Challenges.Queries
+@using QuantumSummerLab.Application.Chats.Commands
+@using QuantumSummerLab.Application.Chats.Queries
+@using QuantumSummerLab.Application.Scores.Commands
+@using QuantumSummerLab.Application.Scores.Queries
+@using QuantumSummerLab.Application.Teams.Commands
+@using QuantumSummerLab.Copilot
+@using QuantumSummerLab.Copilot.Extensions
+
+@inject NavigationManager NavigationManager
+@inject IScrollManager ScrollManager
+@inject ProtectedLocalStorage ProtectedLocalStore
+@inject IMediator Mediator
+@inject ICopilotHelper CopilotHelper
+
+@page "/copilot"
+
+<PageTitle>Quantum Summer Lab - Copilot</PageTitle>
+
+<MudText Typo="Typo.h4" Class="my-4">Quantum Summer Lab Copilot</MudText>
+
+@if (IsLoggedIn)
+{
+    <MudContainer Class="pa-0 pa-md-12">
+        <CopilotPane @ref="_copilotPane" TeamName="@TeamName" ShouldAutoScroll="true" />
+    </MudContainer>
+}
+else
+{
+    <MudAlert Severity="Severity.Info" Class="my-4">You need to <MudLink Href="/login">login</MudLink> to be able to use the Quantum Summer Lab Copilot!</MudAlert>
+}
+
+@code
+{
+    private bool? _lastLoggedIn;
+    private bool IsLoggedIn { get; set; }
+    private string TeamName { get; set; }
+
+    private CopilotPane _copilotPane;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
+
+        if (_lastLoggedIn == null || _lastLoggedIn != authToken.Success)
+        {
+            IsLoggedIn = authToken.Success;
+            TeamName = authToken.Success ? authToken.Value.TeamName : string.Empty;
+            _lastLoggedIn = authToken.Success;
+
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Task.Delay(500);
+        if (_copilotPane != null)
+        {
+            await _copilotPane.Refresh(string.Empty, string.Empty);
+        }
+    }
+}

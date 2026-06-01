@@ -1,0 +1,175 @@
+﻿@using MediatR
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using QuantumSummerLab.Application.Scores.Queries
+@using QuantumSummerLab.Application.Teams.Commands
+
+@page "/"
+
+@inject ProtectedLocalStorage ProtectedLocalStore
+@inject IMediator Mediator
+
+<PageTitle>Quantum Summer Lab - Home</PageTitle>
+
+<MudText Typo="Typo.h4" Class="my-4">Quantum Summer Lab</MudText>
+<MudText Class="mt-8">Welcome to the first technical part of the Quantum Summer Lab 2025.</MudText>
+<MudText Class="mb-4">Using this platform, you are able to practice on multiple challenges, ranging from easy to more difficult.</MudText>
+<MudText>The Quantum Summer Lab 2025 was made possible by</MudText>
+
+<div class="d-flex justify-center flex-wrap gap-12 mt-8">
+    <MudLink Href="https://micronos.be/" Target="_blank"><MudImage Src="micronos.svg" Width="200" Alt="The Cronos Group" /></MudLink>
+    <MudLink Href="https://microsoft.com/" Target="_blank"><MudImage Src="microsoft.svg" Width="200" Alt="Microsoft" /></MudLink>
+    <MudLink Href="https://pasqal.com/" Target="_blank"><MudImage Src="pasqal.svg" Width="200" Alt="Pasqal" /></MudLink>
+    <MudLink Href="https://quantumcircle.eu/" Target="_blank"><MudImage Src="quantumcircle.svg" Width="160" Alt="The Quantum Circle" /></MudLink>
+</div>
+
+<br />
+
+<MudGrid>
+    <MudItem xs="12" md="4" Class="mt-16">
+        <div class="docs-sticky-info explore-text">
+            <MudText Typo="Typo.h5">Example challenges</MudText>
+            <MudText Typo="Typo.subtitle1">In this example challenge, you can learn about what kind of challenges to expect and how to submit solutions.</MudText>
+        </div>
+    </MudItem>
+    <MudItem xs="12" md="8" Class="mt-16">
+        <div class="explore-mudblazor-items">
+            <ExploreCard Title="Example Challenge" Link="/challenge/0">
+                <MudIcon Icon="@Icons.Material.Filled.MenuBook" Size="Size.Large" Color="@(IsLoggedIn? IsChallenge0Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+        </div>
+    </MudItem>
+    <MudItem xs="12" md="4" Class="mt-16">
+        <div class="docs-sticky-info explore-text">
+            <MudText Typo="Typo.h5">Easy challenges</MudText>
+            <MudText Typo="Typo.subtitle1">These challenges are created to teach you about the basics on quantum logic, gates and circuits.</MudText>
+        </div>
+    </MudItem>
+    <MudItem xs="12" md="8" Class="mt-16">
+        <div class="explore-mudblazor-items">
+            <ExploreCard Title="Challenge A1" Link="/challenge/A1">
+                <MudIcon Icon="@Icons.Material.Filled.LooksOne" Color="@(IsLoggedIn? IsChallengeA1Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+
+            <ExploreCard Title="Challenge A2" Link="/challenge/A2">
+                <MudIcon Icon="@Icons.Material.Filled.LooksTwo" Color="@(IsLoggedIn? IsChallengeA2Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+
+            <ExploreCard Title="Challenge A3" Link="/challenge/A3">
+                <MudIcon Icon="@Icons.Material.Filled.Looks3" Color="@(IsLoggedIn? IsChallengeA3Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+        </div>
+    </MudItem>
+    <MudItem xs="12" md="4" Class="mt-16">
+        <div class="docs-sticky-info explore-text">
+            <MudText Typo="Typo.h5">Moderate challenges</MudText>
+            <MudText Typo="Typo.subtitle1">These challenges build on the introductory challenges and provide you with a slightly greater challenge.</MudText>
+        </div>
+    </MudItem>
+    <MudItem xs="12" md="8" Class="mt-16">
+        <div class="explore-mudblazor-items">
+            <ExploreCard Title="Challenge B1" Link="/challenge/B1">
+                <MudIcon Icon="@Icons.Material.Filled.LooksOne" Color="@(IsLoggedIn? IsChallengeB1Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+
+            <ExploreCard Title="Challenge B2" Link="/challenge/B2">
+                <MudIcon Icon="@Icons.Material.Filled.LooksTwo" Color="@(IsLoggedIn? IsChallengeB2Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+
+            <ExploreCard Title="Challenge B3" Link="/challenge/B3">
+                <MudIcon Icon="@Icons.Material.Filled.Looks3" Color="@(IsLoggedIn? IsChallengeB3Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+        </div>
+    </MudItem>
+    <MudItem xs="12" md="4" Class="mt-16">
+        <div class="docs-sticky-info explore-text">
+            <MudText Typo="Typo.h5">Hard challenges</MudText>
+            <MudText Typo="Typo.subtitle1">These challenges ask for some more quantum insight.</MudText>
+        </div>
+    </MudItem>
+    <MudItem xs="12" md="8" Class="mt-16">
+        <div class="explore-mudblazor-items">
+            <ExploreCard Title="Challenge C1" Link="/challenge/C1">
+                <MudIcon Icon="@Icons.Material.Filled.LooksOne" Color="@(IsLoggedIn? IsChallengeC1Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+
+            <ExploreCard Title="Challenge C2" Link="/challenge/C2">
+                <MudIcon Icon="@Icons.Material.Filled.LooksTwo" Color="@(IsLoggedIn? IsChallengeC2Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+
+            <ExploreCard Title="Challenge C3" Link="/challenge/C3">
+                <MudIcon Icon="@Icons.Material.Filled.Looks3" Color="@(IsLoggedIn? IsChallengeC3Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+        </div>
+    </MudItem>
+    <MudItem xs="12" md="4" Class="mt-16">
+        <div class="docs-sticky-info explore-text">
+            <MudText Typo="Typo.h5">Extra challenges</MudText>
+            <MudText Typo="Typo.subtitle1">These challenges are there for you if you need some more thinking.</MudText>
+        </div>
+    </MudItem>
+    <MudItem xs="12" md="8" Class="mt-16">
+        <div class="explore-mudblazor-items">
+            <ExploreCard Title="Challenge D1" Link="/challenge/D1">
+                <MudIcon Icon="@Icons.Material.Filled.LooksOne" Color="@(IsLoggedIn? IsChallengeD1Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+
+            <ExploreCard Title="Challenge D2" Link="/challenge/D2">
+                <MudIcon Icon="@Icons.Material.Filled.LooksTwo" Color="@(IsLoggedIn? IsChallengeD2Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+
+            <ExploreCard Title="Challenge D3" Link="/challenge/D3">
+                <MudIcon Icon="@Icons.Material.Filled.Looks3" Color="@(IsLoggedIn? IsChallengeD3Completed ? Color.Success : Color.Error : Color.Primary)" Style="font-size:64px;" />
+            </ExploreCard>
+        </div>
+    </MudItem>
+</MudGrid>
+
+@code
+{
+
+    private bool IsLoggedIn { get; set; }
+    private bool IsChallenge0Completed { get; set; }
+    private bool IsChallengeA1Completed { get; set; }
+    private bool IsChallengeA2Completed { get; set; }
+    private bool IsChallengeA3Completed { get; set; }
+    private bool IsChallengeB1Completed { get; set; }
+    private bool IsChallengeB2Completed { get; set; }
+    private bool IsChallengeB3Completed { get; set; }
+    private bool IsChallengeC1Completed { get; set; }
+    private bool IsChallengeC2Completed { get; set; }
+    private bool IsChallengeC3Completed { get; set; }
+    private bool IsChallengeD1Completed { get; set; }
+    private bool IsChallengeD2Completed { get; set; }
+    private bool IsChallengeD3Completed { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
+
+            IsLoggedIn = authToken.Success;
+
+            if (IsLoggedIn)
+            {
+                var teamName = authToken.Value.TeamName;
+                var result = await Mediator.Send(new GetYourScoresQuery { TeamName = teamName });
+                IsChallenge0Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "0")?.IsSuccess ?? false;
+                IsChallengeA1Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "A1")?.IsSuccess ?? false;
+                IsChallengeA2Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "A2")?.IsSuccess ?? false;
+                IsChallengeA3Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "A3")?.IsSuccess ?? false;
+                IsChallengeB1Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "B1")?.IsSuccess ?? false;
+                IsChallengeB2Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "B2")?.IsSuccess ?? false;
+                IsChallengeB3Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "B3")?.IsSuccess ?? false;
+                IsChallengeC1Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "C1")?.IsSuccess ?? false;
+                IsChallengeC2Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "C2")?.IsSuccess ?? false;
+                IsChallengeC3Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "C3")?.IsSuccess ?? false;
+                IsChallengeD1Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "D1")?.IsSuccess ?? false;
+                IsChallengeD2Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "D2")?.IsSuccess ?? false;
+                IsChallengeD3Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "D3")?.IsSuccess ?? false;
+            }
+
+            StateHasChanged();
+        }
+    }
+}
