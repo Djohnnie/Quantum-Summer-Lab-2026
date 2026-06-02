@@ -37,7 +37,7 @@
     {
         <MudHidden Breakpoint="Breakpoint.SmAndDown" HiddenChanged="@CopilotHiddenChanged">
             <MudDrawer @bind-Open="_copilotOpen" Anchor="Anchor.End" ClipMode="DrawerClipMode.Always" Variant="@DrawerVariant.Persistent" Width="40%" Elevation="5">
-                <MudContainer Class="mb-12">
+                <MudContainer Class="copilot-drawer mb-12">
                     @if (_copilotOpen)
                     {
                         <MudFab Style="position:fixed; bottom:10px; right:10px; z-index:666;" Color="@Color.Error" StartIcon="@Icons.Material.Filled.Close" DropShadow="true" OnClick="@CloseCopilot" />

@@ -3,6 +3,14 @@
     overscroll-behavior: contain;
 }
 
+.copilot-page #scrollableContainer {
+    overscroll-behavior: auto;
+}
+
+.copilot-drawer #scrollableContainer {
+    overscroll-behavior: auto;
+}
+
 .mud-input > textarea.mud-input-root-outlined {
     font-family: monospace !important;
     font-weight: bold !important;
