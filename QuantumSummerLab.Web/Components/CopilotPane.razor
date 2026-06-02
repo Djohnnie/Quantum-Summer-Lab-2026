@@ -16,7 +16,7 @@
 
 @if (_alert1)
 {
-	<MudAlert class="mb-4" Severity="Severity.Info" ShowCloseIcon="true" CloseIconClicked="@CloseAlert1">Use this experimental Copilot at your own risk. It will try its best to help you solve the challenges and keep track of your chat history. You can just ask it to clear the chat history and start from scratch if you think that is needed.</MudAlert>
+	<MudAlert class="mb-4" Severity="Severity.Info" ShowCloseIcon="true" CloseIconClicked="@CloseAlert1">Use Qubit Buddy at your own risk. It will try its best to help you solve the challenges and keep track of your chat history. You can just ask it to clear the chat history and start from scratch if you think that is needed.</MudAlert>
 }
 
 @if (_alert2)
@@ -30,63 +30,63 @@
 		{
 			if (!string.IsNullOrWhiteSpace(message.Content) && message.Role != ChatRole.System && message.Role != ChatRole.Reduced)
 			{
-				<MudChat ChatPosition="@(message.Role == ChatRole.Assistant ? ChatBubblePosition.Start : ChatBubblePosition.End)">
+				<MudXChat ChatPosition="@(message.Role == ChatRole.Assistant ? ChatBubblePosition.Start : ChatBubblePosition.End)">
 					<MudAvatar Color="@(message.Role == ChatRole.Assistant ? Color.Default : Color.Info)">
 						<MudIcon Icon="@(message.Role == ChatRole.Assistant ? Icons.Material.Filled.Webhook : Icons.Material.Filled.Face)" Color="Color.Default" />
 					</MudAvatar>
 
 					@if (!string.IsNullOrEmpty(message.Header))
 					{
-						<MudChatHeader Name="@(message.Role == ChatRole.Assistant ? "Quantum Summer Lab Copilot" : "You")" Time="@message.Header" />
+						<MudXChatHeader Name="@(message.Role == ChatRole.Assistant ? "Qubit Buddy" : "You")" Time="@message.Header" />
 					}
 
 					@foreach (var sentence in message.Content.Split("[BR]", StringSplitOptions.RemoveEmptyEntries))
 					{
 						@if (!string.IsNullOrWhiteSpace(sentence))
 						{
-							<MudChatBubble Color="@(message.Role == ChatRole.Assistant ? Color.Default : Color.Info)">
+							<MudXChatBubble Color="@(message.Role == ChatRole.Assistant ? Color.Default : Color.Info)">
 								@sentence.Trim()
-							</MudChatBubble>
+							</MudXChatBubble>
 						}
 					}
 
 					@if (message.TokensUsed > 0)
 					{
-						<MudChatFooter Text="@($"{message.TokensUsed:N0} tokens used")" />
+						<MudXChatFooter Text="@($"{message.TokensUsed:N0} tokens used")" />
 					}
-				</MudChat>
+				</MudXChat>
 			}
 		}
 
 		@if (!string.IsNullOrEmpty(_chatHistory.LatestUserMessage))
 		{
-			<MudChat ChatPosition="ChatBubblePosition.End">
+			<MudXChat ChatPosition="ChatBubblePosition.End">
 				<MudAvatar Color="Color.Info">
 					<MudIcon Icon="@Icons.Material.Filled.Face" Color="Color.Default" />
 				</MudAvatar>
-				<MudChatHeader Name="You" Time="just now" />
-				<MudChatBubble Color="Color.Info">
+				<MudXChatHeader Name="You" Time="just now" />
+				<MudXChatBubble Color="Color.Info">
 					@_chatHistory.LatestUserMessage
-				</MudChatBubble>
-			</MudChat>
+				</MudXChatBubble>
+			</MudXChat>
 		}
 
 		@if (_isLoading)
 		{
-			<MudChat ChatPosition="ChatBubblePosition.Start">
+			<MudXChat ChatPosition="ChatBubblePosition.Start">
 				<MudAvatar Color="Color.Default">
 					<MudProgressCircular Size="Size.Small" Color="Color.Default" Indeterminate="true" />
 				</MudAvatar>
 
-				<MudChatBubble Color="Color.Default">
+				<MudXChatBubble Color="Color.Default">
 					...
-				</MudChatBubble>
-			</MudChat>
+				</MudXChatBubble>
+			</MudXChat>
 		}
 	</MudContainer>
 
 	<MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column justify-center gap-4 my-8">
-		<MudTextField T="string" Label="Your question" spellcheck="false" Variant="Variant.Outlined" @bind-Value="Chat" OnKeyUp="@OnKeyUp" TextUpdateSuppression="false"
+		<MudTextField T="string" Label="Your question" spellcheck="false" Variant="Variant.Outlined" @bind-Value="Chat" OnKeyUp="@OnKeyUp"
 					  Adornment="Adornment.End" AdornmentColor="Color.Primary" AdornmentIcon="@Icons.Material.Filled.Send" OnAdornmentClick="@AskQuestion" />
 	</MudContainer>
 </MudContainer>

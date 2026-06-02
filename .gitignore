@@ -5,6 +5,7 @@
 
 # Publish profiles
 *.pubxml
+**/Properties/**
 
 # User-specific files
 **/launchSettings.json

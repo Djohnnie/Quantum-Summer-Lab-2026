@@ -21,7 +21,7 @@
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#reference"))">&nbsp;&nbsp;&nbsp;&nbsp;Quick Reference</MudNavLink>
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#challenge"))">&nbsp;&nbsp;&nbsp;&nbsp;Challenge</MudNavLink>
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#leaderboard"))">&nbsp;&nbsp;&nbsp;&nbsp;Leaderboard</MudNavLink>
-            <MudNavLink OnClick="@((e) => OnNavigateToHeading("#copilot"))">&nbsp;&nbsp;&nbsp;&nbsp;Copilot</MudNavLink>
+            <MudNavLink OnClick="@((e) => OnNavigateToHeading("#copilot"))">&nbsp;&nbsp;&nbsp;&nbsp;Qubit Buddy</MudNavLink>
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#prerequisites"))"><strong>Prerequisites</strong></MudNavLink>
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#logic"))"><strong>Quantum logic</strong></MudNavLink>
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#hgate"))">&nbsp;&nbsp;&nbsp;&nbsp;H-gate</MudNavLink>
@@ -63,18 +63,18 @@
 <MudText Class="mt-4">Each challenge page contains a 'Submit your solution' box with a text field that takes your solution and buttons to submit that solution or clear the text field.</MudText>
 <MudText Class="mt-4">Submitting your proposed solution starts the evaluation on our Quantum Summer Lab challenge platform servers and if all our internal tests are successful, your proposed solution will be accepted and the challenge will be closed for you. If there are issues with your proposed solution, you will get some feedback, based on the challenge, and can try again as many times as you want.</MudText>
 <MudText Class="mt-4">Below the 'Submit your solution' box is a list of your attempts to solve the challenge. We will keep all of your attempts, including the proposed Q# code and the feedback you received for future reference.</MudText>
-<MudText Class="mt-4">From the challenge page, you are able to summon the Quantum Summer Lab Copilot chat and ask it for help with the current challenge.</MudText>
+<MudText Class="mt-4">From the challenge page, you are able to summon Qubit Buddy and ask it for help with the current challenge.</MudText>
 <MudText Typo="Typo.h6" Class="pt-20 mt-4" id="leaderboard">Leaderboard</MudText>
 <MudText Class="mt-4">The leaderboard page contains a list of all participating teams and their position (1st, 2nd, 3rd, ...) based on score and solving speed.</MudText>
 <MudText Class="mt-4">Points are calculated from a base score of 100 points, adding 100, 200, 300 or 400 points for each successfully solved challenge (based on its difficulty level), subtracting 1 point for each failed attempt to solve a challenge.</MudText>
 <MudText Class="mt-4">The Quantum Summer Lab 2025 is not a competition, but this leaderboard just gives you that little incentive to try your best solving challenges 😀</MudText>
-<MudText Typo="Typo.h6" Class="pt-20 mt-4" id="copilot">Copilot</MudText>
-<MudText Class="mt-4">The copilot page contains a custom LLM-based copilot chat that is grounded with information about the Quantum Summer Lab and the challenges on this challenge platform.</MudText>
+<MudText Typo="Typo.h6" Class="pt-20 mt-4" id="copilot">Qubit Buddy</MudText>
+<MudText Class="mt-4">The Qubit Buddy page contains a custom LLM-based chat that is grounded with information about the Quantum Summer Lab and the challenges on this challenge platform.</MudText>
 <MudText Class="mt-4">You can use it to ask for assistance using Q#, quantum logic and with whatever challenge you need help with.</MudText>
-<MudText Class="mt-4">The Quantum Summer Lab copilot will keep the chat history for your team so it should be aware of the context of your conversation.</MudText>
-<MudText Class="mt-4">You can also summon the Quantum Summer Lab Copilot from the challenge page itself by clicking the dedicated button on the bottom-right.</MudText>
-<MudText Class="mt-4">The Quantum Summer Lab copilot can help you with the following things:</MudText>
-<MudList Class="mt-4" T="string" Dense="true" Width="100%">
+<MudText Class="mt-4">Qubit Buddy will keep the chat history for your team so it should be aware of the context of your conversation.</MudText>
+<MudText Class="mt-4">You can also summon Qubit Buddy from the challenge page itself by clicking the dedicated button on the bottom-right.</MudText>
+<MudText Class="mt-4">Qubit Buddy can help you with the following things:</MudText>
+<MudList Class="mt-4" T="string" Dense="true" Style="width: 100%;">
     <MudListItem Icon="@Icons.Material.Filled.CheckCircle">Guidance on quantum logic, gates and circuits.</MudListItem>
     <MudListItem Icon="@Icons.Material.Filled.CheckCircle">Guidance on the Q# programming language.</MudListItem>
     <MudListItem Icon="@Icons.Material.Filled.CheckCircle">Information and guidance on the current challenge you are working on. Use it on the challenge page, or tell it the challenge code (A1..D3) you are working on.</MudListItem>

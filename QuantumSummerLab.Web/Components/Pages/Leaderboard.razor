@@ -42,7 +42,7 @@
                     }
                     else
                     {
-                        <MudText><strong>@($"{(context.ChallengesCompleted == 0 ? "No" : $"{context.ChallengesCompleted}")}") @($"{(context.ChallengesCompleted == 1 ? "challenge" : "challenges")}")</strong> completed in <strong>@context.ChallengesTried @($"{(context.ChallengesTried == 1 ? "try" : "tries")}")</strong> and <strong>@context.ProcessingTime.AsDuration() spent</strong> keeping our Copilot busy!</MudText>
+                        <MudText><strong>@($"{(context.ChallengesCompleted == 0 ? "No" : $"{context.ChallengesCompleted}")}") @($"{(context.ChallengesCompleted == 1 ? "challenge" : "challenges")}")</strong> completed in <strong>@context.ChallengesTried @($"{(context.ChallengesTried == 1 ? "try" : "tries")}")</strong> and <strong>@context.ProcessingTime.AsDuration() spent</strong> keeping Qubit Buddy busy!</MudText>
                     }
                 </MudTd>
             </RowTemplate>

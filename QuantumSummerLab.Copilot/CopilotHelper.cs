@@ -58,7 +58,7 @@ public class CopilotHelper : ICopilotHelper
             var chatHistoryCopy = chatHistory.Copy();
 
             var agentName = "QuantumSummerLabAgent";
-            var agentDescription = "Copilot agent that helps with the Quantum Summer Lab";
+            var agentDescription = "Qubit Buddy agent that helps with the Quantum Summer Lab";
             var instructions = BuildInstructions(chatHistoryCopy);
             var tools = CopilotFunctions.GetTools();
             var agent = InitializeAgent(agentName, agentDescription, instructions, tools);
@@ -153,11 +153,11 @@ public class CopilotHelper : ICopilotHelper
     private static string BuildInstructions(ChatHistory chatHistory)
     {
         var instructionsBuilder = new StringBuilder();
-        instructionsBuilder.AppendLine("You are the Quantum Summer Lab Copilot and should only answer to questions related to solving Microsoft Q# coding challenges.");
+        instructionsBuilder.AppendLine("You are Qubit Buddy and should only answer to questions related to solving Microsoft Q# coding challenges.");
         instructionsBuilder.AppendLine($"Your user has registered using the team name '{chatHistory.TeamName}'. You should address them with this team name and every action or tool call should be executed with this team name. If the user tries to use a different team name, don't execute their request.");
         instructionsBuilder.AppendLine("You are only allowed to converse in English, Dutch, German or French.");
         instructionsBuilder.AppendLine("You should never format your output, not even using markdown or asterisks, because the UI that shows your responses does not have support for this. Split-up every sentence with [BR] so it will be easier to display, but still use punctuation: So, [BR] after every dot, question mark or exclamation mark at the end of a sentence, no exceptions! Also always use ● for bullet points that are ALWAYS prepended by [BR] so that they start on a new line.");
-        instructionsBuilder.AppendLine("You are allowed to answer questions about yourself: You can joke about the fact that you are a copilot specifically created by Johnny Hooyberghs for the Quantum Summer Lab and will self-destruct after the event has been completed.");
+        instructionsBuilder.AppendLine("You are allowed to answer questions about yourself: You can joke about the fact that you are an assistant named Qubit Buddy, specifically created by Johnny Hooyberghs for the Quantum Summer Lab, and will self-destruct after the event has been completed.");
         instructionsBuilder.AppendLine("You should help the user with questions related to quantum algorithms, quantum gates and quantum circuits using Q# as a coding language.");
         instructionsBuilder.AppendLine("You should never provide a solution to challenges, but instead give the user small and incremental hints and directions on how they can get closer to solving it. Always encourage the user to keep trying and figure out the challenge.");
         instructionsBuilder.AppendLine("If applicable, try to talk about how different gates have an influence on the state of a qubit and what this could look like in the Bloch sphere.");
@@ -240,7 +240,7 @@ public class ChatHistory
 
     public ChatHistory()
     {
-        AddAssistantMessage("Hello! I am the Quantum Summer Lab Copilot. How can I assist you today?", 0, string.Empty, null, true);
+        AddAssistantMessage("Hello! I am Qubit Buddy. How can I assist you today?", 0, string.Empty, null, true);
     }
 
     public ChatHistory Copy()
