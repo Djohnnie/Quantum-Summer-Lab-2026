@@ -18,9 +18,10 @@ using var serviceProvider = serviceCollection.BuildServiceProvider();
 Console.WriteLine("Quantum Summer Lab 2025 console tool");
 Console.WriteLine("------------------------------------");
 Console.WriteLine();
-Console.WriteLine("1. Clear database");
-Console.WriteLine("2. Add challenges");
-Console.WriteLine("3. Exit");
+Console.WriteLine("1. Migrate database");
+Console.WriteLine("2. Clear database");
+Console.WriteLine("3. Add challenges");
+Console.WriteLine("4. Exit");
 Console.WriteLine();
 
 var key = Console.ReadKey(true);
@@ -29,18 +30,33 @@ switch (key.Key)
 {
     case ConsoleKey.D1:
     case ConsoleKey.NumPad1:
-        await ClearDatabase(serviceProvider);
+        await MigrateDatabase(serviceProvider);
         break;
     case ConsoleKey.D2:
     case ConsoleKey.NumPad2:
-        await AddChallenges(serviceProvider);
+        await ClearDatabase(serviceProvider);
         break;
     case ConsoleKey.D3:
     case ConsoleKey.NumPad3:
+        await AddChallenges(serviceProvider);
+        break;
+    case ConsoleKey.D4:
+    case ConsoleKey.NumPad4:
+        Console.WriteLine("Exiting...");
         return;
     default:
         Console.WriteLine("Invalid option. Exiting...");
         return;
+}
+
+static async Task MigrateDatabase(IServiceProvider serviceProvider)
+{
+    Console.WriteLine("Migrating database...");
+
+    var dbContext = serviceProvider.GetService<QuantumSummerLabDbContext>();
+    await dbContext.Database.MigrateAsync();
+
+    Console.WriteLine("Done migrating database. Exiting...");
 }
 
 static async Task ClearDatabase(IServiceProvider serviceProvider)
