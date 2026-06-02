@@ -16,8 +16,9 @@ public class RegisterCommand : IRequest<RegisterResponse>
 public class RegisterResponse
 {
     public bool Success { get; set; }
-    public AuthenticationToken Token { get; set; }
-    public string ErrorMessage { get; set; }
+    public bool RequiresApproval { get; set; }
+    public AuthenticationToken? Token { get; set; }
+    public string ErrorMessage { get; set; } = string.Empty;
 }
 
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResponse>
@@ -35,45 +36,35 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
 
     public async Task<RegisterResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        try
+        if (string.IsNullOrWhiteSpace(request.TeamName) || string.IsNullOrWhiteSpace(request.Password))
         {
-            if (string.IsNullOrWhiteSpace(request.TeamName) || string.IsNullOrWhiteSpace(request.Password))
-            {
-                return new RegisterResponse
-                {
-                    Success = false,
-                    ErrorMessage = "Team name and password must be provided!"
-                };
-            }
-
-            using var dbContext = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<QuantumSummerLabDbContext>();
-            var passwordHash = _passwordHashHelper.CalculateHash(new PasswordHash
-            {
-                Password = request.Password
-            });
-
-            var newTeam = new Team
-            {
-                Name = request.TeamName,
-                PasswordSalt = passwordHash.Salt,
-                PasswordHash = passwordHash.Hash
-            };
-
-            var trackedTeam = dbContext.Teams.Add(newTeam);
-
-            await dbContext.SaveChangesAsync(cancellationToken);
-
             return new RegisterResponse
             {
-                Success = true,
-                Token = new AuthenticationToken
-                {
-                    TeamId = newTeam.Id,
-                    TeamName = newTeam.Name
-                }
+                Success = false,
+                ErrorMessage = "Team name and password must be provided!"
             };
         }
-        catch (DbUpdateException ex)  
+
+        using var dbContext = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<QuantumSummerLabDbContext>();
+        var isFirstTeam = !await dbContext.Teams.AnyAsync(cancellationToken);
+        var passwordHash = _passwordHashHelper.CalculateHash(request.Password);
+
+        var newTeam = new Team
+        {
+            Name = request.TeamName,
+            PasswordSalt = passwordHash.Salt,
+            PasswordHash = passwordHash.Hash,
+            IsAdmin = isFirstTeam,
+            IsApproved = isFirstTeam
+        };
+
+        dbContext.Teams.Add(newTeam);
+
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
         {
             return new RegisterResponse
             {
@@ -81,13 +72,27 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
                 ErrorMessage = $"We are not able to register a team using the name '{request.TeamName}'"
             };
         }
-        catch
+
+        if (isFirstTeam)
         {
             return new RegisterResponse
             {
-                Success = false,
-                ErrorMessage = "An unknown error has occurred when registering your team :("
+                Success = true,
+                RequiresApproval = false,
+                Token = new AuthenticationToken
+                {
+                    TeamId = newTeam.Id,
+                    TeamName = newTeam.Name,
+                    IsAdmin = true
+                }
             };
         }
+
+        return new RegisterResponse
+        {
+            Success = true,
+            RequiresApproval = true,
+            ErrorMessage = "Your team was registered successfully and is now pending admin approval before login."
+        };
     }
 }

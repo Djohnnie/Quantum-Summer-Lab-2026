@@ -15,14 +15,15 @@ public class LoginCommand : IRequest<LoginResponse>
 public class LoginResponse
 {
     public bool Success { get; set; }
-    public AuthenticationToken Token { get; set; }
-    public string ErrorMessage { get; set; }
+    public AuthenticationToken? Token { get; set; }
+    public string ErrorMessage { get; set; } = string.Empty;
 }
 
 public class AuthenticationToken
 {
     public Guid TeamId { get; set; }
-    public string TeamName { get; set; }
+    public string TeamName { get; set; } = string.Empty;
+    public bool IsAdmin { get; set; }
 }
 
 public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
@@ -62,13 +63,12 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
             };
         }
 
-        var passwordHash = _passwordHashHelper.CalculateHash(new PasswordHash
-        {
-            Password = request.Password,
-            Salt = existingTeam.PasswordSalt
-        });
+        var verificationResult = _passwordHashHelper.Verify(
+            request.Password,
+            existingTeam.PasswordHash,
+            existingTeam.PasswordSalt);
 
-        if (passwordHash.Hash != existingTeam.PasswordHash)
+        if (!verificationResult.IsValid)
         {
             return new LoginResponse
             {
@@ -77,13 +77,31 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
             };
         }
 
+        if (!existingTeam.IsApproved)
+        {
+            return new LoginResponse
+            {
+                Success = false,
+                ErrorMessage = "Your team is waiting for admin approval before you can login."
+            };
+        }
+
+        if (verificationResult.ShouldUpgrade)
+        {
+            var upgradedHash = _passwordHashHelper.CalculateHash(request.Password);
+            existingTeam.PasswordHash = upgradedHash.Hash;
+            existingTeam.PasswordSalt = upgradedHash.Salt;
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+
         return new LoginResponse
         {
             Success = true,
             Token = new AuthenticationToken
             {
                 TeamId = existingTeam.Id,
-                TeamName = existingTeam.Name
+                TeamName = existingTeam.Name,
+                IsAdmin = existingTeam.IsAdmin
             }
         };
     }

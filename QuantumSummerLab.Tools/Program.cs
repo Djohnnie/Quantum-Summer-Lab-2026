@@ -54,6 +54,7 @@ static async Task MigrateDatabase(IServiceProvider serviceProvider)
     Console.WriteLine("Migrating database...");
 
     var dbContext = serviceProvider.GetService<QuantumSummerLabDbContext>();
+    var x = await dbContext.Database.GetPendingMigrationsAsync();
     await dbContext.Database.MigrateAsync();
 
     Console.WriteLine("Done migrating database. Exiting...");

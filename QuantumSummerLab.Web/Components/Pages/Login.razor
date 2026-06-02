@@ -30,6 +30,10 @@
                 {
                     <MudAlert Severity="Severity.Error" Class="my-2">@ErrorMessage</MudAlert>
                 }
+                @if (!string.IsNullOrEmpty(InfoMessage))
+                {
+                    <MudAlert Severity="Severity.Info" Class="my-2">@InfoMessage</MudAlert>
+                }
                 <MudTextField @bind-Value="TeamName" Class="my-4" Label="Team name" spellcheck="false" Variant="Variant.Text" OnKeyUp="@OnKeyUp"></MudTextField>
                 <MudTextField @bind-Value="Password" Class="my-4" Label="Password" spellcheck="false" InputType="InputType.Password" Variant="Variant.Text" OnKeyUp="@OnKeyUp"></MudTextField>
             </MudCardContent>
@@ -55,6 +59,7 @@ else
     private bool IsLoggedIn { get; set; }
     private string LoggedInTeamName { get; set; }
     private string ErrorMessage { get; set; } = string.Empty;
+    private string InfoMessage { get; set; } = string.Empty;
     private string TeamName { get; set; } = string.Empty;
     private string Password { get; set; } = string.Empty;
 
@@ -72,6 +77,9 @@ else
 
     protected async Task Authenticate()
     {
+        ErrorMessage = string.Empty;
+        InfoMessage = string.Empty;
+
         var response = await Mediator.Send(new LoginCommand
         {
             TeamName = TeamName,
@@ -93,17 +101,26 @@ else
 
     protected async Task Register()
     {
+        ErrorMessage = string.Empty;
+        InfoMessage = string.Empty;
+
         var response = await Mediator.Send(new RegisterCommand
         {
             TeamName = TeamName,
             Password = Password
         });
 
-        if (response.Success)
+        if (response.Success && response.Token != null)
         {
             await ProtectedLocalStore.SetAsync("authToken", response.Token);
             NavigationHelper.Update();
             NavigationManager.NavigateTo("/");
+        }
+        else if (response.Success && response.RequiresApproval)
+        {
+            Password = string.Empty;
+            InfoMessage = response.ErrorMessage;
+            StateHasChanged();
         }
         else
         {

@@ -1,0 +1,192 @@
+﻿@using MediatR
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using QuantumSummerLab.Application.Teams.Commands
+@using QuantumSummerLab.Application.Teams.Queries
+@using QuantumSummerLab.Web.Helpers
+
+@inject ProtectedLocalStorage ProtectedLocalStore
+@inject IMediator Mediator
+@inject NavigationHelper NavigationHelper
+
+@page "/teams"
+
+<PageTitle>Quantum Summer Lab - Team management</PageTitle>
+
+<MudText Typo="Typo.h4" Class="my-4">Team management</MudText>
+
+@if (IsLoading)
+{
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+}
+else if (!IsLoggedIn)
+{
+    <MudAlert Severity="Severity.Info" Class="my-4">You need to login before accessing team management.</MudAlert>
+}
+else if (!IsAdmin)
+{
+    <MudAlert Severity="Severity.Warning" Class="my-4">Only approved admin teams can access this page.</MudAlert>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <MudAlert Severity="@(IsErrorMessage ? Severity.Error : Severity.Success)" Class="my-4">@Message</MudAlert>
+    }
+
+    <MudCard Elevation="5" Class="mt-6">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Registered teams</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudTable Items="@ManagedTeams" Hover="true" Bordered="true" Striped="true">
+            <HeaderContent>
+                <MudTh>Team</MudTh>
+                <MudTh>Approved</MudTh>
+                <MudTh>Admin</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Team">@context.TeamName</MudTd>
+                <MudTd DataLabel="Approved">
+                    <MudChip T="string" Color="@(context.IsApproved ? Color.Success : Color.Warning)">
+                        @(context.IsApproved ? "Approved" : "Pending")
+                    </MudChip>
+                </MudTd>
+                <MudTd DataLabel="Admin">
+                    <MudChip T="string" Color="@(context.IsAdmin ? Color.Success : Color.Default)">
+                        @(context.IsAdmin ? "Admin" : "Member")
+                    </MudChip>
+                </MudTd>
+                <MudTd DataLabel="Status">
+                    <MudChip T="string" Color="@(context.IsArchived ? Color.Error : Color.Success)">
+                        @(context.IsArchived ? "Archived" : "Active")
+                    </MudChip>
+                </MudTd>
+                <MudTd DataLabel="Actions">
+                    @if (!context.IsArchived)
+                    {
+                        <MudButton Variant="Variant.Filled"
+                                   Size="Size.Small"
+                                   Color="Color.Info"
+                                   Class="mr-2 mb-2"
+                                   Disabled="@context.IsApproved"
+                                   OnClick="@(() => ApproveTeam(context.TeamId))">
+                            Approve
+                        </MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   Size="Size.Small"
+                                   Color="@(context.IsAdmin ? Color.Warning : Color.Success)"
+                                   Class="mb-2"
+                                   OnClick="@(() => SetAdmin(context.TeamId, !context.IsAdmin))">
+                            @(context.IsAdmin ? "Demote admin" : "Promote admin")
+                        </MudButton>
+                    }
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCard>
+}
+
+@code
+{
+    private bool IsLoading { get; set; } = true;
+    private bool IsLoggedIn { get; set; }
+    private bool IsAdmin { get; set; }
+    private bool IsErrorMessage { get; set; }
+    private string Message { get; set; } = string.Empty;
+    private AuthenticationToken? AuthToken { get; set; }
+    private List<ManagedTeamDto> ManagedTeams { get; set; } = new List<ManagedTeamDto>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
+        IsLoggedIn = authToken.Success;
+        AuthToken = authToken.Success ? authToken.Value : null;
+        IsAdmin = authToken.Success && authToken.Value.IsAdmin;
+
+        if (IsAdmin)
+        {
+            await RefreshTeams();
+        }
+
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task RefreshTeams()
+    {
+        if (AuthToken == null)
+        {
+            return;
+        }
+
+        var response = await Mediator.Send(new GetTeamManagementOverviewQuery
+        {
+            RequestingTeamId = AuthToken.TeamId
+        });
+
+        if (!response.IsAuthorized)
+        {
+            IsAdmin = false;
+            ManagedTeams = new List<ManagedTeamDto>();
+            return;
+        }
+
+        ManagedTeams = response.Teams;
+    }
+
+    private async Task ApproveTeam(Guid teamId)
+    {
+        if (AuthToken == null)
+        {
+            return;
+        }
+
+        var response = await Mediator.Send(new ApproveTeamCommand
+        {
+            RequestingTeamId = AuthToken.TeamId,
+            TeamId = teamId
+        });
+
+        IsErrorMessage = !response.Success;
+        Message = response.Success ? "Team approved successfully." : response.ErrorMessage;
+        await RefreshTeams();
+        StateHasChanged();
+    }
+
+    private async Task SetAdmin(Guid teamId, bool isAdmin)
+    {
+        if (AuthToken == null)
+        {
+            return;
+        }
+
+        var response = await Mediator.Send(new SetTeamAdminStatusCommand
+        {
+            RequestingTeamId = AuthToken.TeamId,
+            TeamId = teamId,
+            IsAdmin = isAdmin
+        });
+
+        IsErrorMessage = !response.Success;
+        Message = response.Success ? "Team role updated successfully." : response.ErrorMessage;
+
+        if (response.Success && AuthToken.TeamId == teamId)
+        {
+            AuthToken.IsAdmin = isAdmin;
+            await ProtectedLocalStore.SetAsync("authToken", AuthToken);
+            NavigationHelper.Update();
+            IsAdmin = isAdmin;
+        }
+
+        await RefreshTeams();
+        StateHasChanged();
+    }
+}

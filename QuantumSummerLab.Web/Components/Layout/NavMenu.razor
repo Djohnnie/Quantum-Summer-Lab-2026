@@ -38,6 +38,11 @@
     </MudNavGroup>
     <MudDivider Class="my-2" />
     <MudNavLink Href="leaderboard" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Leaderboard">Leaderboard</MudNavLink>
+    @if (IsAdmin)
+    {
+        <MudDivider Class="my-2" />
+        <MudNavLink Href="teams" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">Team management</MudNavLink>
+    }
     <MudDivider Class="my-2" />
     <MudNavLink Href="copilot" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Chat">Qubit Buddy</MudNavLink>
 </MudNavMenu>
@@ -45,6 +50,7 @@
 @code
 {
     private bool IsLoggedIn { get; set; }
+    private bool IsAdmin { get; set; }
     private bool IsChallenge0Completed { get; set; }
     private bool IsChallengeA1Completed { get; set; }
     private bool IsChallengeA2Completed { get; set; }
@@ -82,6 +88,7 @@
         var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
 
         IsLoggedIn = authToken.Success;
+        IsAdmin = authToken.Success && authToken.Value.IsAdmin;
 
         if (IsLoggedIn)
         {
