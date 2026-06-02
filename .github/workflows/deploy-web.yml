@@ -1,0 +1,42 @@
+name: Deploy Web App
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "QuantumSummerLab.Web/**"
+      - "QuantumSummerLab.Application/**"
+      - "QuantumSummerLab.Copilot/**"
+      - "QuantumSummerLab.Data/**"
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore QuantumSummerLab.Web/QuantumSummerLab.Web.csproj
+
+      - name: Publish application
+        run: dotnet publish QuantumSummerLab.Web/QuantumSummerLab.Web.csproj --configuration Release --output publish/web
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: quantumsummerlab2025
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_WEB }}
+          package: publish/web
