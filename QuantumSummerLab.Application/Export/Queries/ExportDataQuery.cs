@@ -8,10 +8,12 @@ namespace QuantumSummerLab.Application.Export.Queries;
 
 public class ExportDataQuery : IRequest<ExportDataResponse>
 {
+    public Guid RequestingTeamId { get; set; }
 }
 
 public class ExportDataResponse
 {
+    public bool IsAuthorized { get; set; }
     public DateTime GeneratedAtUtc { get; set; }
     public List<ExportTeam> Teams { get; set; } = new List<ExportTeam>();
     public List<ExportChallenge> Challenges { get; set; } = new List<ExportChallenge>();
@@ -85,6 +87,12 @@ public class ExportDataQueryHandler : IRequestHandler<ExportDataQuery, ExportDat
     {
         using var dbContext = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<QuantumSummerLabDbContext>();
 
+        var requestingTeam = await dbContext.Teams.SingleOrDefaultAsync(x => x.Id == request.RequestingTeamId, cancellationToken);
+        if (requestingTeam == null || requestingTeam.IsArchived || !requestingTeam.IsApproved || !requestingTeam.IsAdmin)
+        {
+            return new ExportDataResponse { IsAuthorized = false };
+        }
+
         var teams = await dbContext.Teams
             .OrderBy(x => x.Name)
             .Select(x => new ExportTeam
@@ -151,6 +159,7 @@ public class ExportDataQueryHandler : IRequestHandler<ExportDataQuery, ExportDat
 
         return new ExportDataResponse
         {
+            IsAuthorized = true,
             GeneratedAtUtc = DateTime.UtcNow,
             Teams = teams,
             Challenges = challenges,
