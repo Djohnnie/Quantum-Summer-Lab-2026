@@ -33,8 +33,8 @@
                 {
                     <MudAlert Severity="Severity.Info" Class="my-2">@InfoMessage</MudAlert>
                 }
-                <MudTextField @bind-Value="TeamName" Class="my-4" Label="Team name" spellcheck="false" Variant="Variant.Outlined" OnKeyUp="@OnKeyUp"></MudTextField>
-                <MudTextField @bind-Value="Password" Class="my-4" Label="Password" spellcheck="false" InputType="InputType.Password" Variant="Variant.Outlined" OnKeyUp="@OnKeyUp"></MudTextField>
+                <MudTextField @bind-Value="TeamName" Class="my-4" Label="Team name" spellcheck="false" Variant="Variant.Outlined" Immediate="true" OnKeyUp="@OnKeyUp"></MudTextField>
+                <MudTextField @bind-Value="Password" Class="my-4" Label="Password" spellcheck="false" InputType="InputType.Password" Variant="Variant.Outlined" Immediate="true" OnKeyUp="@OnKeyUp"></MudTextField>
             </MudCardContent>
             <MudCardActions>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Success" OnClick="@Authenticate" Class="ml-2 mb-2 mr-2">Login</MudButton>
