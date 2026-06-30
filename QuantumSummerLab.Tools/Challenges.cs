@@ -8,7 +8,7 @@ public static class Challenges
     {
         Name = "0",
         Title = "Example Challenge: Prepare |0⟩ or |1⟩",
-        Description = "You are given a single qubit, prepared in the |0⟩ state, and a Result with a possible Zero or One value.[BR]Make sure to change the qubit state and leave it in a |0⟩ or |1⟩ state that corresponds with the provided Result value.[BR]You should implement the following Solve operation to make that happen and keep the signature of the operation exactly like it is.[BR]Go ahead and copy/paste the following template in your Q# project in Visual Studio Code to start working on the solution.",
+        Description = "You are given a single qubit, prepared in the |0⟩ state, and a Result that is either Zero or One.[BR]Prepare the qubit in the |0⟩ or |1⟩ state that corresponds to the provided Result value.[BR]You should implement the following Solve operation to make that happen and keep the signature of the operation exactly as it is.[BR]Go ahead and copy/paste the following template in your Q# project in Visual Studio Code to start working on the solution.",
         Tldr = "You should implement the empty Solve operation below and prepare a |0⟩ or |1⟩ quantum state depending on the provided expectedResult value.",
         SolutionTemplate = "b3BlcmF0aW9uIFNvbHZlIChxIDogUXViaXQsIGV4cGVjdGVkUmVzdWx0IDogUmVzdWx0KSA6IFVuaXQKewogICAgLy8gWW91ciBzb2x1dGlvbiBsb2dpYyBnb2VzIGhlcmUuCn0=",
         ExampleDescription = "Below, you can find a possible solution and additionally, just for reference, the code that will be executed internally to validate the submitted solution.[BR]You should only submit the Solve operation with your implemented solution, or in this example case, a copy from the provided solution below.",
@@ -23,8 +23,8 @@ public static class Challenges
     public static Challenge CHALLENGE_A1 = new Challenge
     {
         Name = "A1",
-        Title = "Generate superposition of all basis states.",
-        Description = "You are given n qubits (1 ≤ n ≤ 8), prepared in the |0..0⟩ state, and you have to implement an operation which generates an equal superposition of all basis states on these qubits.[BR]The \"output\" of your solution is the state in which it left the input qubits.[BR]You should implement the following Solve operation to make that happen and keep the signature of the operation exactly like it is.",
+        Title = "Generate superposition of all basis states",
+        Description = "You are given n qubits (1 ≤ n ≤ 8), prepared in the |0..0⟩ state, and you have to implement an operation which generates an equal superposition of all basis states on these qubits.[BR]The \"output\" of your solution is the state in which it leaves the input qubits.[BR]You should implement the following Solve operation to make that happen and keep the signature of the operation exactly as it is.",
         Tldr = "You should implement the empty Solve operation below and prepare an equal superposition state of all basis states on the provided qubits.",
         SolutionTemplate = "b3BlcmF0aW9uIFNvbHZlIChxcyA6IFF1Yml0W10pIDogVW5pdCAKewogICAgLy8gWW91ciBzb2x1dGlvbiBsb2dpYyBnb2VzIGhlcmUuCn0=",
         ExampleDescription = "",
@@ -40,7 +40,7 @@ public static class Challenges
     {
         Name = "A2",
         Title = "Distinguish I from X",
-        Description = "You are given an operation that implements a single-qubit unitary transformation: either the identity gate (I gate) or the bit-flip gate (X gate).[BR]Your task is to perform necessary operations and/or measurements to figure out which unitary it was and to return 0 if it was the I gate or 1 if it was the X gate.[BR]You are allowed to apply the given operation exactly once.[BR]You have to implement an operation which takes a single-qubit operation as an input and returns an integer. The operation should have the following signature:",
+        Description = "You are given an operation that implements a single-qubit unitary transformation: either the identity gate (I gate) or the bit-flip gate (X gate).[BR]Your task is to perform necessary operations and measurements to figure out which unitary it was and to return 0 if it was the I gate or 1 if it was the X gate.[BR]You are allowed to apply the given operation exactly once.[BR]You have to implement an operation which takes a single-qubit operation as an input and returns an integer. The operation should have the following signature:",
         Tldr = "You should implement the empty Solve operation below and identify if the provided unitary is the I gate (return 0) or the X gate (return 1).",
         SolutionTemplate = "b3BlcmF0aW9uIFNvbHZlICh1bml0YXJ5IDogKFF1Yml0ID0+IFVuaXQpKSA6IEludAp7CiAgICAvLyBZb3VyIHNvbHV0aW9uIGxvZ2ljIGdvZXMgaGVyZS4KfQ==",
         ExampleDescription = "",
@@ -55,8 +55,8 @@ public static class Challenges
     public static Challenge CHALLENGE_A3 = new Challenge
     {
         Name = "A3",
-        Title = "Use only the Z and H gates to bitflip a qubit.",
-        Description = "You can bitflip a qubit by applying the X gate, but in this challenge you are only allowed to use the Z and H gates.[BR]You have to implement an operation which takes a single qubit as input and has no output.[BR]The \"output\" of your solution is the state in which it left the input qubit.",
+        Title = "Use only the Z and H gates to bitflip a qubit",
+        Description = "You can bitflip a qubit by applying the X gate, but in this challenge you are only allowed to use the Z and H gates.[BR]You have to implement an operation which takes a single qubit as input and has no output.[BR]The \"output\" of your solution is the state in which it leaves the input qubit.",
         Tldr = "You should implement the empty Solve operation below and bitflip the provided qubit using only the Z and H gates and without using the X gate.",
         SolutionTemplate = "b3BlcmF0aW9uIFNvbHZlIChxIDogUXViaXQpIDogVW5pdAp7CiAgICAvLyBZb3VyIHNvbHV0aW9uIGxvZ2ljIGdvZXMgaGVyZS4KfQ==",
         ExampleDescription = "",
@@ -72,7 +72,7 @@ public static class Challenges
     {
         Name = "B1",
         Title = "Generate |+⟩ state or |-⟩ state",
-        Description = "You have to implement an operation which takes a qubit that has been prepared in the |0⟩ state and an integer that specifies the desired sign: +1 for the |+⟩ state and -1 for |-⟩ state.[BR]You should implement the following Solve operation to make that happen and keep the signature of the operation exactly like it is.",
+        Description = "You have to implement an operation which takes a qubit that has been prepared in the |0⟩ state and an integer that specifies the desired sign: +1 for the |+⟩ state and -1 for the |-⟩ state.[BR]You should implement the following Solve operation to make that happen and keep the signature of the operation exactly as it is.",
         Tldr = "You should implement the empty Solve operation below and prepare a |+⟩ or |-⟩ quantum state depending on the provided sign value.",
         SolutionTemplate = "b3BlcmF0aW9uIFNvbHZlIChxIDogUXViaXQsIHNpZ24gOiBJbnQpIDogVW5pdAp7CiAgICAvLyBZb3VyIHNvbHV0aW9uIGxvZ2ljIGdvZXMgaGVyZS4KfQ==",
         ExampleDescription = "",
@@ -120,8 +120,8 @@ public static class Challenges
     {
         Name = "C1",
         Title = "Generate GHZ state",
-        Description = "Your task is to create Greenberger–Horne–Zeilinger (GHZ) state on N qubits (1 ≤ N ≤ 8) in zero |0..0⟩ state.[BR]The GHZ state is defined as |GHZ⟩ = 1/√2 (|0..0⟩ + |1..1⟩).[BR]You have to implement an operation which takes an array of N qubits and you need to create the GHZ state on them. The operation should have the following signature:",
-        Tldr = "You should implement the empty Solve operation below and prepare the Greenberger–Horne–Zeilinger (GHZ) on the provided qubits.",
+        Description = "Your task is to create a Greenberger–Horne–Zeilinger (GHZ) state on n qubits (1 ≤ n ≤ 8) in zero |0..0⟩ state.[BR]The GHZ state is defined as |GHZ⟩ = 1/√2 (|0..0⟩ + |1..1⟩).[BR]You have to implement an operation which takes an array of n qubits and you need to create the GHZ state on them. The operation should have the following signature:",
+        Tldr = "You should implement the empty Solve operation below and prepare the Greenberger–Horne–Zeilinger (GHZ) state on the provided qubits.",
         SolutionTemplate = "b3BlcmF0aW9uIFNvbHZlIChxcyA6IFF1Yml0W10pIDogVW5pdAp7CiAgICAvLyBZb3VyIHNvbHV0aW9uIGxvZ2ljIGdvZXMgaGVyZS4KfQ==",
         ExampleDescription = "",
         ExampleCode = "",
@@ -152,7 +152,7 @@ public static class Challenges
     {
         Name = "C3",
         Title = "Increment",
-        Description = "Implement an operation on a register of n qubits that increments the number written in the register modulo 2^n.[BR]Your operation should take an array of qubits that encodes an unsigned integer in little-endian format, with the least significant bit written first (corresponding to the array element with index 0).[BR]The Solve operation should take the input register and change it without measuring it in order to keep the quantum state, but increment the values its state represents.[BR]For example:[BR]1/2(|0001⟩ + |0010⟩ + |0100⟩ + |1000⟩) should be incremented to 1/2(|1001⟩ + |1010⟩ + |1100⟩ + |0100)[BR]The solve operation should have the following signature:",
+        Description = "Implement an operation on a register of n qubits that increments the number written in the register modulo 2^n.[BR]Your operation should take an array of qubits that encodes an unsigned integer in little-endian format, with the least significant bit written first (corresponding to the array element with index 0).[BR]The Solve operation should take the input register and change it without measuring it in order to keep the quantum state, but increment the values its state represents.[BR]For example:[BR]1/2(|0001⟩ + |0010⟩ + |0100⟩ + |1000⟩) should be incremented to 1/2(|1001⟩ + |1010⟩ + |1100⟩ + |0100⟩)[BR]The solve operation should have the following signature:",
         Tldr = "You should implement the empty Solve operation below and increment the number encoded (in little-endian format) in the provided register of n qubits modulo 2^n.",
         SolutionTemplate = "b3BlcmF0aW9uIFNvbHZlIChyZWdpc3RlciA6IFF1Yml0W10pIDogVW5pdCBpcyBBZGogKyBDdGwKewogICAgLy8gWW91ciBzb2x1dGlvbiBsb2dpYyBnb2VzIGhlcmUuCn0=",
         ExampleDescription = "",
@@ -184,7 +184,7 @@ public static class Challenges
     {
         Name = "D2",
         Title = "Generate generalized W-state",
-        Description = "Your task is to create Greenberger–Horne–Zeilinger (W) state on n qubits where n = 2^k (1 ≤ k ≤ 4) from zero |0..0⟩ state.[BR]The W-state is defined as |W⟩ = 1/√3 (|100⟩ + |010⟩ + |001⟩) for n = 3.[BR]The generalized W-state is defined as |W⟩ = 1/√n (|10..0⟩ + |01..0⟩ + ... + |00..1⟩) for n > 3 where n = 2^k (1 ≤ k ≤ 4).[BR]You have to implement the Solve operation which takes an array of n qubits in state |0..0⟩ and you need to create the W-state on them.[BR]The operation should have the following signature:",
+        Description = "Your task is to create a generalized W state on n qubits where n = 2^k (1 ≤ k ≤ 4) from zero |0..0⟩ state.[BR]The W-state is defined as |W⟩ = 1/√3 (|100⟩ + |010⟩ + |001⟩) for n = 3.[BR]The generalized W-state is defined as |W⟩ = 1/√n (|10..0⟩ + |01..0⟩ + ... + |00..1⟩) for n > 3 where n = 2^k (1 ≤ k ≤ 4).[BR]You have to implement the Solve operation which takes an array of n qubits in state |0..0⟩ and you need to create the W-state on them.[BR]The operation should have the following signature:",
         Tldr = "You should implement the empty Solve operation below and prepare a generalized W-state on the provided 2^k (1 ≤ k ≤ 4) qubits.",
         SolutionTemplate = "b3BlcmF0aW9uIFNvbHZlIChxcyA6IFF1Yml0W10pIDogVW5pdAp7CiAgICAvLyBZb3VyIHNvbHV0aW9uIGxvZ2ljIGdvZXMgaGVyZS4KfQ==",
         ExampleDescription = "",
@@ -199,9 +199,9 @@ public static class Challenges
     public static Challenge CHALLENGE_D3 = new Challenge
     {
         Name = "D3",
-        Title = "Deutch-Jozsa algorithm.",
-        Description = "You have to implement the Deutsch-Jozsa algorithm which determines whether a given oracle function is constant or balanced:[BR]If the oracle function is constant it returns 0 or 1 on all inputs.[BR]If the oracle function is balanced it returns 0 on half of the inputs and 1 on the other half.[BR]The oracle function is assumed to always be constant or balanced.[BR]Implement the Solve operation where n is the number of bits in the input register and oracle provides you with the oracle function that takes an input register and and output bit.[BR]The solve operation should return true if the oracle function is constant and false if it is balanced.",
-        Tldr = "You should implement the Deutch-Jozsa algorithm in the empty Solve operation below and identify if the oracle function is constant or balanced.",
+        Title = "Deutsch-Jozsa algorithm",
+        Description = "You have to implement the Deutsch-Jozsa algorithm which determines whether a given oracle function is constant or balanced:[BR]If the oracle function is constant it returns 0 or 1 on all inputs.[BR]If the oracle function is balanced it returns 0 on half of the inputs and 1 on the other half.[BR]The oracle function is assumed to always be constant or balanced.[BR]Implement the Solve operation where n is the number of bits in the input register and oracle provides you with the oracle function that takes an input register and an output bit.[BR]The solve operation should return true if the oracle function is constant and false if it is balanced.",
+        Tldr = "You should implement the Deutsch-Jozsa algorithm in the empty Solve operation below and identify if the oracle function is constant or balanced.",
         SolutionTemplate = "b3BlcmF0aW9uIFNvbHZlIChuIDogSW50LCBvcmFjbGUgOiAoUXViaXRbXSwgUXViaXQpID0+IFVuaXQpIDogQm9vbAp7CiAgICAvLyBZb3VyIHNvbHV0aW9uIGxvZ2ljIGdvZXMgaGVyZS4KfQ==",
         ExampleDescription = "",
         ExampleCode = "",
@@ -210,5 +210,14 @@ public static class Challenges
         ExpectedStates = "",
         CopilotInstructions = "",
         Level = 4
+    };
+
+    public static readonly IReadOnlyList<Challenge> All = new[]
+    {
+        CHALLENGE_0,
+        CHALLENGE_A1, CHALLENGE_A2, CHALLENGE_A3,
+        CHALLENGE_B1, CHALLENGE_B2, CHALLENGE_B3,
+        CHALLENGE_C1, CHALLENGE_C2, CHALLENGE_C3,
+        CHALLENGE_D1, CHALLENGE_D2, CHALLENGE_D3,
     };
 }
