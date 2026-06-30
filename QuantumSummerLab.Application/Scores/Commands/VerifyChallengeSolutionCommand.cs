@@ -13,7 +13,7 @@ namespace QuantumSummerLab.Application.Scores.Commands;
 public class VerifyChallengeSolutionCommand : IRequest<VerifyChallengeSolutionResponse>
 {
     public string ChallengeName { get; set; }
-    public string TeamName { get; set; }
+    public Guid RequestingTeamId { get; set; }
     public string Solution { get; set; }
     public DateTime Timestamp { get; set; }
 }
@@ -68,10 +68,20 @@ public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChall
     {
         using var dbContext = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<QuantumSummerLabDbContext>();
 
+        var team = await dbContext.Teams.SingleOrDefaultAsync(
+            x => x.Id == request.RequestingTeamId, cancellationToken);
+        if (team == null || team.IsArchived || !team.IsApproved)
+        {
+            return new VerifyChallengeSolutionResponse
+            {
+                IsValid = false,
+                FeedbackMessage = "You must be signed in with an approved team to submit a solution.",
+                Feedback = new List<VerificationFeedback>()
+            };
+        }
+
         var challenge = await dbContext.Challenges.SingleOrDefaultAsync(
                 x => x.Name == request.ChallengeName, cancellationToken);
-        var team = await dbContext.Teams.SingleOrDefaultAsync(
-            x => x.Name == request.TeamName, cancellationToken);
 
         var verificationTemplate = challenge.VerificationTemplate.FromBase64String();
         var solution = verificationTemplate.Replace("<<SOLVE>>", request.Solution);

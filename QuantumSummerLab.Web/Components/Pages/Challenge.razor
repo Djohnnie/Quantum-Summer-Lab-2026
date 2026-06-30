@@ -181,6 +181,7 @@ else
 
     private bool IsLoggedIn { get; set; }
     private string TeamName { get; set; }
+    private Guid TeamId { get; set; }
     private bool IsLoading { get; set; }
     private bool IsAvailable { get; set; }
     private bool IsSubmitting { get; set; }
@@ -233,6 +234,7 @@ else
         {
             IsLoggedIn = authToken.Success;
             TeamName = authToken.Success ? authToken.Value.TeamName : string.Empty;
+            TeamId = authToken.Success ? authToken.Value.TeamId : Guid.Empty;
             _lastLoggedIn = authToken.Success;
 
             await LoadScore();
@@ -248,7 +250,7 @@ else
         var response = await Mediator.Send(new VerifyChallengeSolutionCommand
         {
             ChallengeName = ChallengeName,
-            TeamName = TeamName,
+            RequestingTeamId = TeamId,
             Solution = Solution,
             Timestamp = DateTime.UtcNow
         });
