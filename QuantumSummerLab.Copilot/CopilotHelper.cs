@@ -60,7 +60,7 @@ public class CopilotHelper : ICopilotHelper
             var agentName = "QuantumSummerLabAgent";
             var agentDescription = "Qubit Buddy agent that helps with the Quantum Summer Lab";
             var instructions = BuildInstructions(chatHistoryCopy);
-            var tools = CopilotFunctions.GetTools();
+            var tools = new CopilotFunctions(chatHistory.TeamName).GetTools();
             var agent = InitializeAgent(agentName, agentDescription, instructions, tools);
 
             var tokensUsedForReducing = 0;

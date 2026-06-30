@@ -11,7 +11,14 @@ namespace QuantumSummerLab.Copilot;
 
 public class CopilotFunctions
 {
-    public static IList<AITool> GetTools()
+    private readonly string _teamName;
+
+    public CopilotFunctions(string teamName)
+    {
+        _teamName = teamName;
+    }
+
+    public IList<AITool> GetTools()
     {
         return [
             AIFunctionFactory.Create(GetChallengeInformation),
@@ -63,17 +70,16 @@ public class CopilotFunctions
         return responseBuilder.ToString();
     }
 
-    [Description("Gets the latest proposal for a specific team name and challenge name.")]
-    [return: Description("The submitted code by the team for the specific challenge.")]
-    public static async Task<string> GetMyLatestProposal(
-        [Description("The name of the team that submitted the code.")] string teamName,
+    [Description("Gets the latest proposal of the current team for a specific challenge name.")]
+    [return: Description("The submitted code by the current team for the specific challenge.")]
+    public async Task<string> GetMyLatestProposal(
         [Description("The name of the challenge to get the submitted code for.")] string challengeName,
         IServiceProvider serviceProvider)
     {
         var mediator = serviceProvider.GetRequiredService<IMediator>();
         var proposals = await mediator.Send(new GetYourSubmissionsQuery
         {
-            TeamName = teamName,
+            TeamName = _teamName,
             ChallengeName = challengeName
         });
 
@@ -93,14 +99,12 @@ public class CopilotFunctions
         return responseBuilder.ToString();
     }
 
-    [Description("Clear the chat history for a specific team.")]
+    [Description("Clear the chat history of the current team.")]
     [return: Description("A code that needs to be sent to the user after clearing has completed.")]
-    public static async Task<string> ClearMyChatHistory(
-        [Description("The name of the team that would like to have its chat history cleared.")] string teamName,
-        IServiceProvider serviceProvider)
+    public async Task<string> ClearMyChatHistory(IServiceProvider serviceProvider)
     {
         var mediator = serviceProvider.GetRequiredService<IMediator>();
-        await mediator.Send(new ClearChatCommand { TeamName = teamName });
+        await mediator.Send(new ClearChatCommand { TeamName = _teamName });
 
         return "<<CHAT CLEARED>>";
     }
