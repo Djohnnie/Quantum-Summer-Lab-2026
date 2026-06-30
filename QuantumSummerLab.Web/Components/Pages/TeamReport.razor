@@ -1,0 +1,309 @@
+﻿@using MediatR
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using QuantumSummerLab.Application.Challenges.Queries
+@using QuantumSummerLab.Application.Scores.Queries
+@using QuantumSummerLab.Application.Teams.Commands
+@using QuantumSummerLab.Application.Teams.Queries
+@using QuantumSummerLab.Copilot.Extensions
+
+@inject ProtectedLocalStorage ProtectedLocalStore
+@inject IMediator Mediator
+
+@page "/reports/{TeamId}"
+
+<PageTitle>Quantum Summer Lab - Challenge report</PageTitle>
+
+<MudText Typo="Typo.h4" Class="my-4">Challenge report</MudText>
+
+@if (IsLoading)
+{
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+}
+else if (!IsLoggedIn)
+{
+    <MudAlert Severity="Severity.Info" Class="my-4">You need to login before accessing challenge reports.</MudAlert>
+}
+else if (!IsAdmin)
+{
+    <MudAlert Severity="Severity.Warning" Class="my-4">Only approved admin teams can access this page.</MudAlert>
+}
+else if (TeamNotFound)
+{
+    <MudAlert Severity="Severity.Error" Class="my-4">The requested team could not be found.</MudAlert>
+}
+else
+{
+    <MudText Typo="Typo.h6" Class="mb-4">@TeamName</MudText>
+
+    @foreach (var group in _challenges)
+    {
+        <MudText Typo="Typo.h5" Class="mt-12 mb-4">@group.Title</MudText>
+        <MudExpansionPanels Elevation="5">
+            @foreach (var challenge in group.Challenges)
+            {
+                <MudExpansionPanel>
+                    <TitleContent>
+                        <div class="d-flex">
+                            <MudIcon Icon="@(challenge.IsSuccess.HasValue? challenge.IsSuccess.Value? Icons.Material.Filled.Check : Icons.Material.Filled.Close : Icons.Material.Filled.Extension)" Color="@(challenge.IsSuccess.HasValue? challenge.IsSuccess.Value? Color.Success: Color.Error : Color.Default)" />
+                            <MudChip T="string" Color="@(challenge.IsSuccess.HasValue? challenge.IsSuccess.Value? Color.Success: Color.Error : Color.Default)" Class="ml-4 mr-4 mt-n1 mb-0">@challenge.Score points (@challenge.TotalAttempts attempts)</MudChip>
+                            <MudText><strong>@challenge.Name</strong> @challenge.Title</MudText>
+                        </div>
+                    </TitleContent>
+                    <ChildContent>
+                        @if (challenge.Submissions != null && challenge.Submissions.Any())
+                        {
+                            <MudCard Elevation="0">
+                                <MudCardHeader>
+                                    <CardHeaderContent>
+                                        <MudText Typo="Typo.h6">Submission history</MudText>
+                                    </CardHeaderContent>
+                                </MudCardHeader>
+                                <MudCardContent>
+                                    @if (challenge.IsSuccess.HasValue && challenge.IsSuccess.Value)
+                                    {
+                                        <MudAlert Severity="Severity.Success" Class="mt-n6 mb-2">@challenge.TeamName has successfully solved this challenge in @challenge.TotalAttempts attempts!</MudAlert>
+                                    }
+                                    else
+                                    {
+                                        <MudAlert Severity="Severity.Info" Class="mt-n6 mb-2">@(challenge.TotalAttempts == 0 ? $"{challenge.TeamName} has not started this challenge!" : $"{challenge.TeamName} has attempted {challenge.TotalAttempts} times to solve this challenge!")</MudAlert>
+                                    }
+                                    <MudExpansionPanels Outlined="false" Elevation="0">
+                                        @foreach (var submission in challenge.Submissions)
+                                        {
+                                            <MudExpansionPanel>
+                                                <TitleContent>
+                                                    <div class="d-flex">
+                                                        @if (submission.IsSuccess)
+                                                        {
+                                                            <MudIcon Icon="@Icons.Material.Filled.PlaylistAddCheck" Color="Color.Success" class="mr-3"></MudIcon>
+                                                            <MudText Color="Color.Default">@challenge.TeamName has submitted a <strong>correct solution</strong> @submission.SubmissionTimestamp.AsTimeAgo()</MudText>
+                                                        }
+                                                        else
+                                                        {
+                                                            <MudIcon Icon="@Icons.Material.Filled.PlaylistRemove" Color="Color.Error" class="mr-3"></MudIcon>
+                                                            <MudText Color="Color.Default">@challenge.TeamName has submitted a <strong>wrong solution</strong> @submission.SubmissionTimestamp.AsTimeAgo()</MudText>
+                                                        }
+                                                    </div>
+                                                </TitleContent>
+                                                <ChildContent>
+                                                    <MudContainer Class="mb-4">
+                                                        @foreach (var feedback in submission.Feedback)
+                                                        {
+                                                            <div class="d-flex ml-4">
+                                                                <MudIcon Icon="@(feedback.IsValid? Icons.Material.Filled.Check : Icons.Material.Filled.Close)" Color="@(feedback.IsValid? Color.Success: Color.Error)" class="mr-3"></MudIcon>
+                                                                <MudText Color="@(feedback.IsValid? Color.Success: Color.Error)">@feedback.Message</MudText>
+                                                            </div>
+                                                        }
+                                                    </MudContainer>
+                                                    <MudMarkdown Value="@submission.ProposedSolution" />
+                                                </ChildContent>
+                                            </MudExpansionPanel>
+                                            <MudDivider />
+                                        }
+                                    </MudExpansionPanels>
+                                </MudCardContent>
+                            </MudCard>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.h6">No submissions yet</MudText>
+                        }
+                    </ChildContent>
+                </MudExpansionPanel>
+            }
+        </MudExpansionPanels>
+    }
+}
+
+@code
+{
+    [Parameter]
+    public string TeamId { get; set; }
+
+    private bool IsLoading { get; set; } = true;
+    private bool IsLoggedIn { get; set; }
+    private bool IsAdmin { get; set; }
+    private bool TeamNotFound { get; set; }
+    private string TeamName { get; set; } = string.Empty;
+
+    private List<ChallengeGroup> _challenges =
+        [
+            new ChallengeGroup
+            {
+                Title = "Example challenges",
+                Challenges = [
+                    new ChallengeItem { Name = "0" }
+                ]
+            },
+            new ChallengeGroup
+            {
+                Title = "Easy challenges",
+                Challenges = [
+                    new ChallengeItem { Name = "A1" },
+                    new ChallengeItem { Name = "A2" },
+                    new ChallengeItem { Name = "A3" }
+                ]
+            },
+            new ChallengeGroup
+            {
+                Title = "Moderate challenges",
+                Challenges = [
+                    new ChallengeItem { Name = "B1" },
+                    new ChallengeItem { Name = "B2" },
+                    new ChallengeItem { Name = "B3" }
+                ]
+            },
+            new ChallengeGroup
+            {
+                Title = "Hard challenges",
+                Challenges = [
+                    new ChallengeItem { Name = "C1" },
+                    new ChallengeItem { Name = "C2" },
+                    new ChallengeItem { Name = "C3" }
+                ]
+            },
+            new ChallengeGroup
+            {
+                Title = "Extra challenges",
+                Challenges = [
+                    new ChallengeItem { Name = "D1" },
+                    new ChallengeItem { Name = "D2" },
+                    new ChallengeItem { Name = "D3" }
+                ]
+            }
+    ];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
+        IsLoggedIn = authToken.Success;
+        IsAdmin = authToken.Success && authToken.Value.IsAdmin;
+
+        if (!IsAdmin || authToken.Value is null)
+        {
+            IsLoading = false;
+            StateHasChanged();
+            return;
+        }
+
+        if (!Guid.TryParse(TeamId, out var teamId))
+        {
+            TeamNotFound = true;
+            IsLoading = false;
+            StateHasChanged();
+            return;
+        }
+
+        var overview = await Mediator.Send(new GetTeamManagementOverviewQuery
+        {
+            RequestingTeamId = authToken.Value.TeamId
+        });
+
+        if (!overview.IsAuthorized)
+        {
+            IsAdmin = false;
+            IsLoading = false;
+            StateHasChanged();
+            return;
+        }
+
+        var team = overview.Teams.SingleOrDefault(x => x.TeamId == teamId);
+        if (team is null)
+        {
+            TeamNotFound = true;
+            IsLoading = false;
+            StateHasChanged();
+            return;
+        }
+
+        TeamName = team.TeamName;
+        IsLoading = false;
+        StateHasChanged();
+
+        await LoadChallenges();
+    }
+
+    private async Task LoadChallenges()
+    {
+        foreach (var group in _challenges)
+        {
+            foreach (var challenge in group.Challenges)
+            {
+                var challengeResponse = await Mediator.Send(new GetChallengeByNameQuery { ChallengeName = challenge.Name });
+                if (challengeResponse != null)
+                {
+                    challenge.Title = challengeResponse.Title;
+                    StateHasChanged();
+                }
+
+                var scoreResponse = await Mediator.Send(new GetYourScoreQuery { ChallengeName = challenge.Name, TeamName = TeamName });
+                if (scoreResponse != null)
+                {
+                    challenge.TeamName = TeamName;
+                    challenge.IsSuccess = scoreResponse.TotalAttempts == 0 ? null : scoreResponse.IsSuccess;
+                    challenge.TotalAttempts = scoreResponse.TotalAttempts;
+                    challenge.Score = scoreResponse.Score;
+                }
+
+                var submissionsResponse = await Mediator.Send(new GetYourSubmissionsQuery { ChallengeName = challenge.Name, TeamName = TeamName });
+                if (submissionsResponse != null)
+                {
+                    challenge.Submissions = submissionsResponse.YourSubmissions
+                        .Select(s => new SubmissionItem
+                        {
+                            IsSuccess = s.IsSuccessful,
+                            ProposedSolution = s.ProposedSolution,
+                            SubmissionTimestamp = s.SubmissionTimestamp,
+                            Feedback = s.Feedback.Select(f => new FeedbackItem
+                            {
+                                IsValid = f.Valid,
+                                Message = f.Message
+                            }).ToList()
+                        })
+                        .ToList();
+                }
+
+                StateHasChanged();
+            }
+        }
+    }
+
+    class ChallengeGroup
+    {
+        public string Title { get; set; }
+
+        public List<ChallengeItem> Challenges { get; set; } = new List<ChallengeItem>();
+    }
+
+    class ChallengeItem
+    {
+        public string Name { get; set; }
+        public string Title { get; set; } = "...";
+        public string TeamName { get; set; }
+        public bool? IsSuccess { get; set; }
+        public int TotalAttempts { get; set; }
+        public int Score { get; set; }
+
+        public List<SubmissionItem> Submissions { get; set; } = new List<SubmissionItem>();
+    }
+
+    class SubmissionItem
+    {
+        public bool IsSuccess { get; set; }
+        public string ProposedSolution { get; set; }
+        public DateTime SubmissionTimestamp { get; set; }
+
+        public List<FeedbackItem> Feedback { get; set; } = new List<FeedbackItem>();
+    }
+
+    class FeedbackItem
+    {
+        public bool IsValid { get; set; }
+        public string Message { get; set; }
+    }
+}

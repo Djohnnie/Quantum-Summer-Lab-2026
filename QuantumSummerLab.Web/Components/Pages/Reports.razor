@@ -1,0 +1,112 @@
+﻿@using MediatR
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using QuantumSummerLab.Application.Teams.Commands
+@using QuantumSummerLab.Application.Teams.Queries
+
+@inject ProtectedLocalStorage ProtectedLocalStore
+@inject IMediator Mediator
+
+@page "/reports"
+
+<PageTitle>Quantum Summer Lab - Challenge reports</PageTitle>
+
+<MudText Typo="Typo.h4" Class="my-4">Challenge reports</MudText>
+
+@if (IsLoading)
+{
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+}
+else if (!IsLoggedIn)
+{
+    <MudAlert Severity="Severity.Info" Class="my-4">You need to login before accessing challenge reports.</MudAlert>
+}
+else if (!IsAdmin)
+{
+    <MudAlert Severity="Severity.Warning" Class="my-4">Only approved admin teams can access this page.</MudAlert>
+}
+else
+{
+    <MudCard Elevation="5" Class="mt-6">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Registered teams</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudTable Items="@ManagedTeams" Hover="true" Bordered="true" Striped="true">
+            <HeaderContent>
+                <MudTh>Team</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Team">@context.TeamName</MudTd>
+                <MudTd DataLabel="Status">
+                    <MudChip T="string" Color="@(context.IsArchived ? Color.Error : Color.Success)">
+                        @(context.IsArchived ? "Archived" : "Active")
+                    </MudChip>
+                </MudTd>
+                <MudTd DataLabel="Actions">
+                    <MudButton Variant="Variant.Filled"
+                               Size="Size.Small"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Assessment"
+                               Href="@($"/reports/{context.TeamId}")">
+                        View report
+                    </MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCard>
+}
+
+@code
+{
+    private bool IsLoading { get; set; } = true;
+    private bool IsLoggedIn { get; set; }
+    private bool IsAdmin { get; set; }
+    private AuthenticationToken? AuthToken { get; set; }
+    private List<ManagedTeamDto> ManagedTeams { get; set; } = new List<ManagedTeamDto>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
+        IsLoggedIn = authToken.Success;
+        AuthToken = authToken.Success ? authToken.Value : null;
+        IsAdmin = authToken.Success && authToken.Value.IsAdmin;
+
+        if (IsAdmin)
+        {
+            await RefreshTeams();
+        }
+
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task RefreshTeams()
+    {
+        if (AuthToken == null)
+        {
+            return;
+        }
+
+        var response = await Mediator.Send(new GetTeamManagementOverviewQuery
+        {
+            RequestingTeamId = AuthToken.TeamId
+        });
+
+        if (!response.IsAuthorized)
+        {
+            IsAdmin = false;
+            ManagedTeams = new List<ManagedTeamDto>();
+            return;
+        }
+
+        ManagedTeams = response.Teams;
+    }
+}

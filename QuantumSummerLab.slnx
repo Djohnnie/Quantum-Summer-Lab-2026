@@ -9,7 +9,6 @@
     <Project Path="QuantumSummerLab.Data/QuantumSummerLab.Data.csproj" />
   </Folder>
   <Folder Name="/3. UX/">
-    <Project Path="QuantumSummerLab.Admin/QuantumSummerLab.Admin.csproj" />
     <Project Path="QuantumSummerLab.Copilot/QuantumSummerLab.Copilot.csproj" />
     <Project Path="QuantumSummerLab.Processor/QuantumSummerLab.Processor.csproj" />
     <Project Path="QuantumSummerLab.Web/QuantumSummerLab.Web.csproj" />

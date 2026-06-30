@@ -67,21 +67,25 @@ else
                 <MudTd DataLabel="Actions">
                     @if (!context.IsArchived)
                     {
-                        <MudButton Variant="Variant.Filled"
-                                   Size="Size.Small"
-                                   Color="Color.Info"
-                                   Class="mr-2 mb-2"
-                                   Disabled="@context.IsApproved"
-                                   OnClick="@(() => ApproveTeam(context.TeamId))">
-                            Approve
-                        </MudButton>
-                        <MudButton Variant="Variant.Filled"
-                                   Size="Size.Small"
-                                   Color="@(context.IsAdmin ? Color.Warning : Color.Success)"
-                                   Class="mb-2"
-                                   OnClick="@(() => SetAdmin(context.TeamId, !context.IsAdmin))">
-                            @(context.IsAdmin ? "Demote admin" : "Promote admin")
-                        </MudButton>
+                        <MudTooltip Text="Approve team">
+                            <MudIconButton Icon="@Icons.Material.Filled.CheckCircle"
+                                           Size="Size.Small"
+                                           Color="Color.Info"
+                                           Disabled="@context.IsApproved"
+                                           OnClick="@(() => ApproveTeam(context.TeamId))" />
+                        </MudTooltip>
+                        <MudTooltip Text="@(context.IsAdmin ? "Demote admin" : "Promote admin")">
+                            <MudIconButton Icon="@(context.IsAdmin ? Icons.Material.Filled.RemoveModerator : Icons.Material.Filled.AddModerator)"
+                                           Size="Size.Small"
+                                           Color="@(context.IsAdmin ? Color.Warning : Color.Success)"
+                                           OnClick="@(() => SetAdmin(context.TeamId, !context.IsAdmin))" />
+                        </MudTooltip>
+                        <MudTooltip Text="Archive team">
+                            <MudIconButton Icon="@Icons.Material.Filled.Archive"
+                                           Size="Size.Small"
+                                           Color="Color.Error"
+                                           OnClick="@(() => ArchiveTeam(context.TeamId))" />
+                        </MudTooltip>
                     }
                 </MudTd>
             </RowTemplate>
@@ -186,6 +190,25 @@ else
             IsAdmin = isAdmin;
         }
 
+        await RefreshTeams();
+        StateHasChanged();
+    }
+
+    private async Task ArchiveTeam(Guid teamId)
+    {
+        if (AuthToken == null)
+        {
+            return;
+        }
+
+        var response = await Mediator.Send(new ArchiveTeamCommand
+        {
+            RequestingTeamId = AuthToken.TeamId,
+            TeamId = teamId
+        });
+
+        IsErrorMessage = !response.Success;
+        Message = response.Success ? "Team archived successfully." : response.ErrorMessage;
         await RefreshTeams();
         StateHasChanged();
     }
