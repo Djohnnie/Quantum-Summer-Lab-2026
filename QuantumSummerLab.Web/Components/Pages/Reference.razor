@@ -148,63 +148,63 @@
 <MudText Typo="Typo.h6" Class="pt-20 mt-4" id="operations">Quantum operations</MudText>
 <MudText Class="mt-4">A quantum operation works similarly to functions or methods in other programming languages, with the key difference that it performs quantum operations by changing qubit states.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_operation1" />
+    <ThemedMarkdown Value="@_operation1" />
 </MudContainer>
 <MudText Class="mt-4">An operation begins with the keyword <code>operation</code>, followed by its unique name and a parenthesized list of arguments. Arguments are comma-separated, each consisting of a name, a colon, and its data type. The declaration ends with a colon and the return type—use <code>Unit</code> when there is no return value. The operation body is enclosed in curly braces.</MudText>
 <MudText Class="mt-4">The example above shows an operation named <code>Solve</code> with a single argument <code>a</code> of type <code>Qubit</code> and a <code>Unit</code> return type, indicating no return value.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_operation2" />
+    <ThemedMarkdown Value="@_operation2" />
 </MudContainer>
 <MudText Class="mt-4">The <code>Main</code> operation is the entry point of any Q# application. Use it in Visual Studio Code *.qs files to simulate quantum programs locally.</MudText>
 <MudText Class="mt-4">Operations that return a value, such as an <code>Int</code>, must include a compatible return statement at the end of their body, or in every possible execution path.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_operation3" />
+    <ThemedMarkdown Value="@_operation3" />
 </MudContainer>
 <MudText Typo="Typo.h6" Class="pt-20 mt-4" id="qubits">Working with qubits</MudText>
 <MudText Class="mt-4">In Q#, a qubit is represented by the <code>Qubit</code> data type. Since qubits are scarce resources, you must allocate them within a <code>use</code> statement.</MudText>
 <MudText Class="mt-4">Use the <code>Qubit()</code> constructor for a single qubit or <code>Qubit[n]</code> for an array of qubits.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_qubit1" />
+    <ThemedMarkdown Value="@_qubit1" />
 </MudContainer>
 <MudText Class="mt-4">When an allocated qubit goes out of scope (for example, when leaving an operation's curly braces), it is automatically freed by the runtime. One important thing to know: you must always leave qubits in their |0⟩ state before they are freed. Use the <code>Reset</code> or <code>ResetAll</code> operations to achieve this.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_qubit2" />
+    <ThemedMarkdown Value="@_qubit2" />
 </MudContainer>
 <MudText Typo="Typo.h6" Class="pt-20 mt-4" id="gates">Applying quantum gates</MudText>
 <MudText Class="mt-4">Most quantum gates are available in Q# as built-in operations. To place a qubit in superposition, call the <code>H</code> operation and pass the qubit as an argument.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_call1" />
+    <ThemedMarkdown Value="@_call1" />
 </MudContainer>
 <MudText Class="mt-4">Some operations accept multiple arguments, including multiple qubits. The following example allocates two qubits and entangles them using the CNOT gate.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_call2" />
+    <ThemedMarkdown Value="@_call2" />
 </MudContainer>
 <MudText Typo="Typo.h6" Class="pt-20 mt-4" id="variables">Working with variables</MudText>
 <MudText Class="mt-4">Q# supports both immutable and mutable variables. After measuring a qubit, you receive a collapsed state (|0⟩ or |1⟩) of type <code>Result</code>. Store this in an immutable variable using the <code>let</code> keyword.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_variables1" />
+    <ThemedMarkdown Value="@_variables1" />
 </MudContainer>
 <MudText Class="mt-4">Create mutable variables using the <code>mutable</code> and <code>set</code> keywords to change their values after creation.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_variables2" />
+    <ThemedMarkdown Value="@_variables2" />
 </MudContainer>
 <MudText Class="mt-4">The same logic can be written more concisely using a conditional expression, as shown below.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_variables3" />
+    <ThemedMarkdown Value="@_variables3" />
 </MudContainer>
 <MudText Typo="Typo.h6" Class="pt-20 mt-4" id="debugging">Debugging</MudText>
 <MudText Class="mt-4">Since Q# runs in a simulated environment on your computer, you can use various debugging techniques to understand what your code is doing.</MudText>
 <MudText Class="mt-4">Use <code>Message</code> with string interpolation to write output to the Terminal.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_debugging1" />
+    <ThemedMarkdown Value="@_debugging1" />
 </MudContainer>
 <MudText Class="mt-4">Use <code>DumpRegister</code> to write the complete quantum state representation to the Terminal.</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_debugging2" />
+    <ThemedMarkdown Value="@_debugging2" />
 </MudContainer>
 <MudText Class="mt-4">The example above produces the following output:</MudText>
 <MudContainer Class="mt-4">
-    <MudMarkdown Value="@_debugging3" />
+    <ThemedMarkdown Value="@_debugging3" />
 </MudContainer>
 @code
 {

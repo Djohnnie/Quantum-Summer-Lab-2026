@@ -1,0 +1,25 @@
+@* Wraps MudMarkdown and gives its code blocks a syntax-highlight theme that
+   matches the current MudBlazor dark/light mode. Reading the cascading
+   IsDarkMode value makes the very first render use the correct theme (the
+   MudMarkdown default is a light theme), and any dark-mode toggle re-renders
+   this wrapper so the code blocks switch in realtime. *@
+
+<MudMarkdown Value="@Value" Styling="@_styling" />
+
+@code
+{
+    [Parameter]
+    public string Value { get; set; }
+
+    [CascadingParameter(Name = "IsDarkMode")]
+    private bool IsDarkMode { get; set; }
+
+    private MudMarkdownStyling _styling = new();
+
+    protected override void OnParametersSet()
+    {
+        var styling = new MudMarkdownStyling();
+        styling.CodeBlock.Theme = IsDarkMode ? CodeBlockTheme.GithubDark : CodeBlockTheme.Github;
+        _styling = styling;
+    }
+}

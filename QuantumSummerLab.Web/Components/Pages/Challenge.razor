@@ -7,6 +7,7 @@
 @using QuantumSummerLab.Copilot
 @using QuantumSummerLab.Copilot.Extensions
 @using QuantumSummerLab.Web.Helpers
+@using BlazorMonaco.Editor
 
 @inject NavigationManager NavigationManager
 @inject NavigationHelper NavigationHelper
@@ -14,6 +15,7 @@
 @inject IMediator Mediator
 @inject DrawerHelper DrawerHelper
 @inject ICopilotHelper CopilotHelper
+@inject IJSRuntime JS
 
 @page "/challenge/{ChallengeName}"
 
@@ -59,7 +61,7 @@ else if (IsAvailable)
         <MudText Typo="Typo.body1" Class="my-4">@line</MudText>
     }
 
-    <MudMarkdown Value="@SolutionTemplate" />
+    <ThemedMarkdown Value="@SolutionTemplate" />
 
     @if (ExampleDescription.Any())
     {
@@ -67,7 +69,7 @@ else if (IsAvailable)
         {
             <MudText Typo="Typo.body1" Class="my-4">@line</MudText>
         }
-        <MudMarkdown Value="@ExampleCode" />
+        <ThemedMarkdown Value="@ExampleCode" />
     }
 
     @if (IsLoggedIn)
@@ -95,7 +97,14 @@ else if (IsAvailable)
                             }
                         </MudContainer>
                     }
-                    <MudTextField @bind-Value="Solution" Label="Your solution" spellcheck="false" Lines="5" Variant="Variant.Outlined" Class="monospace"></MudTextField>
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Your solution</MudText>
+                    <div class="qsharp-editor-wrapper">
+                        <StandaloneCodeEditor @ref="_editor"
+                                              Id="qsharp-solution-editor"
+                                              CssClass="qsharp-editor"
+                                              ConstructionOptions="EditorConstructionOptions"
+                                              OnDidInit="OnEditorInit" />
+                    </div>
                 </MudCardContent>
                 <MudCardActions>
                     @if (IsSubmitting)
@@ -156,7 +165,7 @@ else if (IsAvailable)
                                                 </div>
                                             }
                                     </div>
-                                    <MudMarkdown Value="@submission.ProposedSolution" />
+                                    <ThemedMarkdown Value="@submission.ProposedSolution" />
                                 </ChildContent>
                             </MudExpansionPanel>
                             <MudDivider />
@@ -200,34 +209,51 @@ else
 
     private string Solution { get; set; }
 
+    private StandaloneCodeEditor _editor;
+    private bool _editorReady;
+    private bool? _appliedDarkMode;
+    private string _loadedChallengeName;
+
+    [CascadingParameter(Name = "IsDarkMode")]
+    private bool IsDarkMode { get; set; }
+
     private bool IsSuccess { get; set; }
     private int NumberOfAttempts { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        IsLoading = true;
-        var challenge = await Mediator.Send(new GetChallengeByNameQuery { ChallengeName = ChallengeName });
-        IsAvailable = challenge.IsAvailable;
-        if (IsAvailable)
+        if (_loadedChallengeName != ChallengeName)
         {
-            Title = challenge.Title;
-            Description = challenge.Description.Split("[BR]");
-            Tldr = challenge.Tldr;
-            SolutionTemplate = $"```js{Environment.NewLine}{challenge.SolutionTemplate}{Environment.NewLine}```";
-            ExampleDescription = challenge.ExampleDescription.Split("[BR]", StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
-            ExampleCode = $"```js{Environment.NewLine}{challenge.ExampleCode}{Environment.NewLine}```";
-            FeedbackMessage = "You have not yet submitted a solution";
-            VerificationFeedback = new List<VerificationFeedback>();
-            CopilotInstructions = challenge.CopilotInstructions;
-            Clear();
-            await LoadScore();
+            _loadedChallengeName = ChallengeName;
+            IsLoading = true;
+
+            var challenge = await Mediator.Send(new GetChallengeByNameQuery { ChallengeName = ChallengeName });
+            IsAvailable = challenge.IsAvailable;
+            if (IsAvailable)
+            {
+                Title = challenge.Title;
+                Description = challenge.Description.Split("[BR]");
+                Tldr = challenge.Tldr;
+                SolutionTemplate = $"```js{Environment.NewLine}{challenge.SolutionTemplate}{Environment.NewLine}```";
+                ExampleDescription = challenge.ExampleDescription.Split("[BR]", StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
+                ExampleCode = $"```js{Environment.NewLine}{challenge.ExampleCode}{Environment.NewLine}```";
+                FeedbackMessage = "You have not yet submitted a solution";
+                VerificationFeedback = new List<VerificationFeedback>();
+                CopilotInstructions = challenge.CopilotInstructions;
+                await Clear();
+                await LoadScore();
+            }
+
+            IsLoading = false;
         }
 
-        IsLoading = false;
+        await ApplyEditorThemeAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await ApplyEditorThemeAsync();
+
         var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
 
         if (_lastLoggedIn == null || _lastLoggedIn != authToken.Success)
@@ -246,6 +272,11 @@ else
     {
         IsSubmitting = true;
         StateHasChanged();
+
+        if (_editorReady)
+        {
+            Solution = await _editor.GetValue();
+        }
 
         var response = await Mediator.Send(new VerifyChallengeSolutionCommand
         {
@@ -267,12 +298,16 @@ else
         StateHasChanged();
     }
 
-    protected void Clear()
+    protected async Task Clear()
     {
         Solution = string.Empty;
         IsValid = null;
         FeedbackMessage = "You have not yet submitted a solution";
         VerificationFeedback = new List<VerificationFeedback>();
+        if (_editorReady)
+        {
+            await _editor.SetValue(string.Empty);
+        }
         StateHasChanged();
     }
 
@@ -291,6 +326,46 @@ else
 
             var submissions = await Mediator.Send(new GetYourSubmissionsQuery { ChallengeName = ChallengeName = ChallengeName, TeamName = TeamName });
             YourSubmissions = submissions.YourSubmissions;
+        }
+    }
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "qsharp",
+            Theme = IsDarkMode ? "vs-dark" : "vs",
+            Value = Solution ?? string.Empty,
+            FontSize = 14,
+            Minimap = new EditorMinimapOptions { Enabled = false },
+            ScrollBeyondLastLine = false,
+            TabSize = 4,
+            InsertSpaces = true,
+        };
+    }
+
+    private async Task OnEditorInit()
+    {
+        _editorReady = true;
+
+        if (!string.IsNullOrEmpty(Solution))
+        {
+            await _editor.SetValue(Solution);
+        }
+
+        // Force a render so OnAfterRenderAsync applies the theme once the editor
+        // is painted. Applying the theme here (pre-paint) leaves the first editor
+        // of the session showing Monaco's default light theme until re-navigation.
+        StateHasChanged();
+    }
+
+    private async Task ApplyEditorThemeAsync()
+    {
+        if (_editorReady && _appliedDarkMode != IsDarkMode)
+        {
+            _appliedDarkMode = IsDarkMode;
+            await BlazorMonaco.Editor.Global.SetTheme(JS, IsDarkMode ? "vs-dark" : "vs");
         }
     }
 }

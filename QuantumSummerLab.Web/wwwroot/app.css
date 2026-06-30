@@ -193,3 +193,21 @@
 .mudx-chat-filled-default {
     border: 1px solid var(--mud-palette-lines-default);
 }
+
+/* Markdown code blocks: clean outline + rounded corners (theme-aware,
+   the highlight.js color theme itself follows dark/light in realtime) */
+.mud-markdown-body pre code.hljs {
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 8px;
+}
+
+/* Q# solution code editor (BlazorMonaco) */
+.qsharp-editor-wrapper {
+    border: 1px solid var(--mud-palette-lines-inputs);
+    border-radius: var(--mud-default-borderradius);
+    overflow: hidden;
+}
+
+.qsharp-editor {
+    height: 360px;
+}

@@ -7,11 +7,13 @@
 @inject NavigationManager NavigationManager
 @inject ProtectedLocalStorage ProtectedLocalStore
 @inject DrawerHelper DrawerHelper
+@inject IMudMarkdownThemeService MarkdownThemeService
 
 <MudThemeProvider @ref="_mudThemeProvider" Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
+<CascadingValue Value="_isDarkMode" Name="IsDarkMode">
 <MudLayout>
     <MudAppBar Elevation="0" Fixed="true">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
@@ -51,6 +53,7 @@
         @Body
     </MudMainContent>
 </MudLayout>
+</CascadingValue>
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
@@ -67,6 +70,7 @@
     private bool _isDarkMode = true;
     private MudTheme? _theme = null;
     private bool? _lastLoggedIn;
+    private bool _shouldRefreshCodeTheme;
 
     private CopilotPane _copilotPane;
     
@@ -88,6 +92,8 @@
                 DefaultBorderRadius = "8px"
             }
         };
+
+        ApplyCodeBlockTheme();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -95,6 +101,13 @@
         if (firstRender)
         {
             _isDarkMode = await _mudThemeProvider.GetSystemDarkModeAsync();
+            ApplyCodeBlockTheme();
+        }
+
+        if (_shouldRefreshCodeTheme)
+        {
+            _shouldRefreshCodeTheme = false;
+            ApplyCodeBlockTheme();
         }
 
         var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
@@ -115,6 +128,12 @@
     private void DarkModeToggle()
     {
         _isDarkMode = !_isDarkMode;
+        ApplyCodeBlockTheme();
+    }
+
+    private void ApplyCodeBlockTheme()
+    {
+        MarkdownThemeService.SetCodeBlockTheme(_isDarkMode ? CodeBlockTheme.GithubDark : CodeBlockTheme.Github);
     }
 
     private void Login()
@@ -133,6 +152,7 @@
     {
         _copilotEnabled = !e.Location.Contains("reference");
         _copilotOpen = false;
+        _shouldRefreshCodeTheme = true;
 
         StateHasChanged();
     }
