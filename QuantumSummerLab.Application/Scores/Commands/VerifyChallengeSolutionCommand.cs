@@ -55,13 +55,16 @@ public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChall
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IConfiguration _configuration;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     public VerifyChallengeSolutionCommandHandler(
         IServiceScopeFactory scopeFactory,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IHttpClientFactory httpClientFactory)
     {
         _scopeFactory = scopeFactory;
         _configuration = configuration;
+        _httpClientFactory = httpClientFactory;
     }
 
     public async Task<VerifyChallengeSolutionResponse> Handle(VerifyChallengeSolutionCommand request, CancellationToken cancellationToken)
@@ -72,19 +75,23 @@ public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChall
             x => x.Id == request.RequestingTeamId, cancellationToken);
         if (team == null || team.IsArchived || !team.IsApproved)
         {
-            return new VerifyChallengeSolutionResponse
-            {
-                IsValid = false,
-                FeedbackMessage = "You must be signed in with an approved team to submit a solution.",
-                Feedback = new List<VerificationFeedback>()
-            };
+            return Failure("You must be signed in with an approved team to submit a solution.");
         }
 
         var challenge = await dbContext.Challenges.SingleOrDefaultAsync(
                 x => x.Name == request.ChallengeName, cancellationToken);
+        if (challenge == null)
+        {
+            return Failure($"The challenge '{request.ChallengeName}' could not be found.");
+        }
+
+        var qsharpHelperBaseAddress = _configuration.GetValue<string>("QSHARP_HELPER_BASE_ADDRESS");
+        if (string.IsNullOrWhiteSpace(qsharpHelperBaseAddress))
+        {
+            return Failure("The verification service is not configured. Please try again later.");
+        }
 
         var verificationTemplate = challenge.VerificationTemplate.FromBase64String();
-        var solution = verificationTemplate.Replace("<<SOLVE>>", request.Solution);
 
         var requestData = new QSharpRequest
         {
@@ -94,12 +101,29 @@ public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChall
             ExpectedStates = challenge.ExpectedStates
         };
 
-        var qsharpHelperBaseAdderess = _configuration.GetValue<string>("QSHARP_HELPER_BASE_ADDRESS");
+        QSharpFeedback? feedback;
+        try
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri(qsharpHelperBaseAddress);
+            var httpResponse = await httpClient.PostAsJsonAsync("api/QSharpVerificationFunction", requestData, cancellationToken);
 
-        var httpClient = new HttpClient();
-        httpClient.BaseAddress = new Uri(qsharpHelperBaseAdderess);
-        var httpResponse = await httpClient.PostAsJsonAsync("api/QSharpVerificationFunction", requestData, cancellationToken);
-        var feedback = await httpResponse.Content.ReadFromJsonAsync<QSharpFeedback>(cancellationToken);
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                return Failure("The verification service could not process your solution. Please try again.");
+            }
+
+            feedback = await httpResponse.Content.ReadFromJsonAsync<QSharpFeedback>(cancellationToken);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or NotSupportedException)
+        {
+            return Failure("The verification service is currently unavailable. Please try again later.");
+        }
+
+        if (feedback == null)
+        {
+            return Failure("The verification service returned an invalid response. Please try again.");
+        }
 
         dbContext.Scores.Add(new Score
         {
@@ -123,4 +147,11 @@ public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChall
             }).ToList()
         };
     }
+
+    private static VerifyChallengeSolutionResponse Failure(string message) => new()
+    {
+        IsValid = false,
+        FeedbackMessage = message,
+        Feedback = new List<VerificationFeedback>()
+    };
 }

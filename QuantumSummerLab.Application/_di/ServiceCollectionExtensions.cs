@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddScoped<IPasswordHashHelper, PasswordHashHelper>();
+        services.AddHttpClient();
         services.AddDataServices();
 
         return services;

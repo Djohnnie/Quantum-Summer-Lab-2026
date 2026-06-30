@@ -4,6 +4,7 @@ using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenAI;
 using OpenAI.Chat;
 using QuantumSummerLab.Application.Chats.Commands;
@@ -25,15 +26,18 @@ public class CopilotHelper : ICopilotHelper
     private readonly IMediator _mediator;
     private readonly IServiceProvider _serviceProvider;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<CopilotHelper> _logger;
 
     public CopilotHelper(
         IMediator mediator,
         IServiceProvider serviceProvider,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILogger<CopilotHelper> logger)
     {
         _mediator = mediator;
         _serviceProvider = serviceProvider;
         _configuration = configuration;
+        _logger = logger;
     }
 
     public AIAgent InitializeAgent(string name, string description, string instructions, IList<AITool>? tools = null)
@@ -51,6 +55,8 @@ public class CopilotHelper : ICopilotHelper
 
     public async Task<ChatHistory> Chat(ChatHistory chatHistory)
     {
+        var hadError = false;
+
         try
         {
             var timestamp = Stopwatch.GetTimestamp();
@@ -121,12 +127,23 @@ public class CopilotHelper : ICopilotHelper
         }
         catch (Exception ex)
         {
-            // Nothing to do here, the chat history will be returned as is.
+            _logger.LogError(ex, "An error occurred while processing the chat for team {TeamName}.", chatHistory.TeamName);
+            hadError = true;
         }
 
         // Fetch the latest chat history from the database to ensure consistency.
         var chatsResponse = await _mediator.Send(new GetChatsQuery { TeamName = chatHistory.TeamName });
-        return GetChatHistoryFromResponse(chatsResponse);
+        var refreshedHistory = GetChatHistoryFromResponse(chatsResponse);
+
+        if (hadError)
+        {
+            refreshedHistory.AddAssistantMessage(
+                "Sorry, something went wrong while processing your request. Please try again in a moment.",
+                0,
+                "Just now");
+        }
+
+        return refreshedHistory;
     }
 
     private async Task<(string, int)> Reduce(ChatHistory chatHistory)
