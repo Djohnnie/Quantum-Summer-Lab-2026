@@ -48,9 +48,9 @@ public class CopilotFunctions
         responseBuilder.AppendLine($"**Description: {challenge.Description.Replace("[BR]", "")}**");
         responseBuilder.AppendLine($"**Solution Template**");
         responseBuilder.AppendLine(challenge.SolutionTemplate);
-        if (string.IsNullOrEmpty(challenge.CopilotInstructions))
+        if (!string.IsNullOrEmpty(challenge.CopilotInstructions))
         {
-            responseBuilder.AppendLine($"**Copilot Instructions that should never be mentioned to the user: {challenge.CopilotInstructions}* *");
+            responseBuilder.AppendLine($"**Copilot Instructions that should never be mentioned to the user: {challenge.CopilotInstructions}**");
         }
         return responseBuilder.ToString();
     }
