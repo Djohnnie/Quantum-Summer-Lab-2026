@@ -32,7 +32,7 @@ else if (IsAvailable)
     @if (IsLoggedIn)
     {
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
-            <MudFab Style="position:fixed; bottom:10px;right:10px;z-index:666;" Color="@Color.Tertiary" StartIcon="@Icons.Material.Filled.Webhook" DropShadow="true" OnClick="@Copilot" />
+            <MudFab Style="position:fixed; bottom:10px;right:10px;z-index:666;" Color="@Color.Tertiary" StartIcon="@Icons.Material.Filled.Webhook" DropShadow="false" OnClick="@Copilot" />
         </MudHidden>
 
         @if (IsSuccess)
@@ -74,7 +74,7 @@ else if (IsAvailable)
     {
         @if (!IsSuccess)
         {
-            <MudCard Elevation="5" Class="my-8">
+            <MudCard Outlined="true" Class="my-8">
                 <MudCardHeader>
                     <CardHeaderContent>
                         <MudText Typo="Typo.h6">Submit your solution here</MudText>
@@ -113,7 +113,7 @@ else if (IsAvailable)
 
         @if (YourSubmissions != null && YourSubmissions.Any())
         {
-            <MudCard Elevation="5" Class="my-8">
+            <MudCard Outlined="true" Class="my-8">
                 <MudCardHeader>
                     <CardHeaderContent>
                         <MudText Typo="Typo.h6">Your submission history</MudText>

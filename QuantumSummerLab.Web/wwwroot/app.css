@@ -73,5 +73,123 @@
 .nav-border {
     border-inline-start-style: solid !important;
     border-inline-start-width: 2px !important;
-    border-inline-start-color: #808080 !important;
+    border-inline-start-color: var(--mud-palette-lines-default) !important;
+}
+
+/* =====================================================================
+   Professional flat theme — Quantum Summer Lab
+   Removes elevation shadows, applies clean outlines, adds subtle motion
+   while preserving the MudBlazor look & feel.
+   ===================================================================== */
+
+/* Smooth, consistent transitions for theme changes & interactions */
+.mud-paper,
+.mud-button-root,
+.mud-nav-link,
+.mud-chip,
+.mud-table,
+.mud-expand-panel,
+.mud-expand-panel-header,
+.mud-input-control,
+.mud-avatar,
+.mud-icon-button {
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+
+/* 1. Flat design — strip every elevation shadow */
+[class*="mud-elevation-"],
+.mud-card,
+.mud-paper,
+.mud-button,
+.mud-fab,
+.mud-table-container,
+.mud-picker,
+.mud-popover,
+.mud-menu,
+[class*="mudx-"] {
+    box-shadow: none !important;
+}
+
+/* 2. Outlined surfaces — a hairline border replaces the removed shadow
+      (also keeps menus, popovers & dialogs readable on flat backgrounds) */
+.mud-paper {
+    border: 1px solid var(--mud-palette-lines-default);
+}
+
+/* App bar: single bottom hairline + frosted glass */
+.mud-appbar {
+    border: none;
+    border-bottom: 1px solid var(--mud-palette-lines-default);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+}
+
+/* Drawers: a single edge outline instead of a full frame */
+.mud-drawer {
+    border: none;
+}
+.mud-drawer.mud-drawer-pos-left {
+    border-right: 1px solid var(--mud-palette-lines-default);
+}
+.mud-drawer.mud-drawer-pos-right {
+    border-left: 1px solid var(--mud-palette-lines-default);
+}
+
+/* Avoid double outlines for surfaces nested directly inside a card */
+.mud-card .mud-table,
+.mud-card .mud-expansion-panels {
+    border: none;
+}
+
+/* 3. Subtle, professional motion */
+
+/* Gentle entrance for content cards & panels */
+@keyframes qsl-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+.mud-card,
+.mud-main-content > .mud-expansion-panels {
+    animation: qsl-fade-in .35s ease both;
+}
+
+/* Buttons & FABs lift slightly on hover — motion instead of shadow */
+.mud-button:not(:disabled):hover,
+.mud-fab:not(:disabled):hover {
+    transform: translateY(-1px);
+}
+.mud-button:not(:disabled):active,
+.mud-fab:not(:disabled):active {
+    transform: translateY(0);
+}
+
+/* Keyboard focus stays visible as a clean outline (shadows are removed) */
+.mud-button:focus-visible,
+.mud-icon-button:focus-visible,
+.mud-fab:focus-visible,
+.mud-nav-link:focus-visible {
+    outline: 2px solid var(--mud-palette-primary);
+    outline-offset: 2px;
+}
+
+/* Explore cards: outline accent + lift on hover */
+.explore-mudblazor-items a {
+    text-decoration: none;
+}
+.explore-mudblazor-items a > .mud-paper {
+    transition: border-color .2s ease, transform .2s ease, background-color .2s ease;
+}
+.explore-mudblazor-items a:hover > .mud-paper {
+    border-color: var(--mud-palette-primary);
+    transform: translateY(-3px);
+}
+
+/* Table rows: smooth hover highlight */
+.mud-table-hover tbody tr {
+    transition: background-color .15s ease;
+}
+
+/* MudX chat: give the neutral assistant bubble a clean outline */
+.mudx-chat-filled-default {
+    border: 1px solid var(--mud-palette-lines-default);
 }
