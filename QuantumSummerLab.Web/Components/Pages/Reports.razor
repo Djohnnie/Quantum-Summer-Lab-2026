@@ -36,6 +36,9 @@ else
             <HeaderContent>
                 <MudTh>Team</MudTh>
                 <MudTh>Status</MudTh>
+                <MudTh>Total score</MudTh>
+                <MudTh>Succeeded / failed</MudTh>
+                <MudTh>Submissions</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
@@ -45,6 +48,13 @@ else
                         @(context.IsArchived ? "Archived" : "Active")
                     </MudChip>
                 </MudTd>
+                <MudTd DataLabel="Total score">@context.TotalScore</MudTd>
+                <MudTd DataLabel="Succeeded / failed">
+                    <MudText Color="Color.Success" Typo="Typo.body2" Class="d-inline">@context.ChallengesSucceeded</MudText>
+                    <span class="mx-1">/</span>
+                    <MudText Color="Color.Error" Typo="Typo.body2" Class="d-inline">@context.ChallengesFailed</MudText>
+                </MudTd>
+                <MudTd DataLabel="Submissions">@context.SubmissionCount</MudTd>
                 <MudTd DataLabel="Actions">
                     <MudButton Variant="Variant.Filled"
                                Size="Size.Small"

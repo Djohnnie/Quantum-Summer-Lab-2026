@@ -23,6 +23,11 @@ public class ManagedTeamDto
     public bool IsApproved { get; set; }
     public bool IsAdmin { get; set; }
     public bool IsArchived { get; set; }
+    public int SubmissionCount { get; set; }
+    public int TotalScore { get; set; }
+    public int ChallengesSucceeded { get; set; }
+    public int ChallengesFailed { get; set; }
+    public int MessagesSent { get; set; }
 }
 
 public class GetTeamManagementOverviewQueryHandler : IRequestHandler<GetTeamManagementOverviewQuery, GetTeamManagementOverviewResponse>
@@ -60,6 +65,51 @@ public class GetTeamManagementOverviewQueryHandler : IRequestHandler<GetTeamMana
                 IsArchived = x.IsArchived
             })
             .ToListAsync(cancellationToken);
+
+        var submissions = await dbContext.Scores
+            .Select(s => new
+            {
+                TeamId = s.Team.Id,
+                ChallengeId = s.Challenge.Id,
+                ChallengeLevel = s.Challenge.Level,
+                s.IsSuccessful
+            })
+            .ToListAsync(cancellationToken);
+
+        var scoreStatsByTeam = submissions
+            .GroupBy(s => s.TeamId)
+            .ToDictionary(
+                g => g.Key,
+                g => new
+                {
+                    SubmissionCount = g.Count(),
+                    TotalScore = g.Sum(s => s.IsSuccessful ? s.ChallengeLevel * 100 : -1),
+                    ChallengesSucceeded = g.Where(s => s.IsSuccessful).Select(s => s.ChallengeId).Distinct().Count(),
+                    ChallengesAttempted = g.Select(s => s.ChallengeId).Distinct().Count()
+                });
+
+        var messagesSentByTeam = (await dbContext.Chats
+            .Where(c => c.Role == "User")
+            .GroupBy(c => c.Team.Id)
+            .Select(g => new { TeamId = g.Key, MessagesSent = g.Count() })
+            .ToListAsync(cancellationToken))
+            .ToDictionary(x => x.TeamId, x => x.MessagesSent);
+
+        foreach (var team in teams)
+        {
+            if (scoreStatsByTeam.TryGetValue(team.TeamId, out var stats))
+            {
+                team.SubmissionCount = stats.SubmissionCount;
+                team.TotalScore = stats.TotalScore;
+                team.ChallengesSucceeded = stats.ChallengesSucceeded;
+                team.ChallengesFailed = stats.ChallengesAttempted - stats.ChallengesSucceeded;
+            }
+
+            if (messagesSentByTeam.TryGetValue(team.TeamId, out var messagesSent))
+            {
+                team.MessagesSent = messagesSent;
+            }
+        }
 
         return new GetTeamManagementOverviewResponse
         {

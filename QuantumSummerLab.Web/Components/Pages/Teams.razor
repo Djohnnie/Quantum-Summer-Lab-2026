@@ -45,6 +45,7 @@ else
                 <MudTh>Approved</MudTh>
                 <MudTh>Admin</MudTh>
                 <MudTh>Status</MudTh>
+                <MudTh>Submissions</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
@@ -64,6 +65,7 @@ else
                         @(context.IsArchived ? "Archived" : "Active")
                     </MudChip>
                 </MudTd>
+                <MudTd DataLabel="Submissions">@context.SubmissionCount</MudTd>
                 <MudTd DataLabel="Actions">
                     @if (!context.IsArchived)
                     {
