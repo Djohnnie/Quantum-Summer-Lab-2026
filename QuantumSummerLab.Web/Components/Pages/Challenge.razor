@@ -31,6 +31,11 @@ else if (IsAvailable)
 {
     <MudText Typo="Typo.h5" Class="my-4">@Title</MudText>
 
+    <div class="d-flex align-center my-4">
+        <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Color="Color.Primary" Size="Size.Small" Class="mr-2" />
+        <MudText Typo="Typo.body2">@TeamsCompleted other @(TeamsCompleted == 1 ? "team has" : "teams have") completed this challenge.</MudText>
+    </div>
+
     @if (IsLoggedIn)
     {
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
@@ -231,6 +236,7 @@ else
 
     private bool IsSuccess { get; set; }
     private int NumberOfAttempts { get; set; }
+    private int TeamsCompleted { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -254,6 +260,7 @@ else
                 CopilotInstructions = challenge.CopilotInstructions;
                 await Clear();
                 await LoadScore();
+                await LoadStatistics();
             }
 
             IsLoading = false;
@@ -276,6 +283,7 @@ else
             _lastLoggedIn = authToken.Success;
 
             await LoadScore();
+            await LoadStatistics();
             StateHasChanged();
         }
     }
@@ -303,6 +311,7 @@ else
         VerificationFeedback = response.Feedback;
 
         await LoadScore();
+        await LoadStatistics();
 
         IsSubmitting = false;
 
@@ -358,6 +367,16 @@ else
             var submissions = await Mediator.Send(new GetYourSubmissionsQuery { ChallengeName = ChallengeName, TeamName = TeamName });
             YourSubmissions = submissions.YourSubmissions;
         }
+    }
+
+    private async Task LoadStatistics()
+    {
+        var statistics = await Mediator.Send(new GetChallengeStatisticsQuery
+        {
+            ChallengeName = ChallengeName,
+            RequestingTeamId = TeamId
+        });
+        TeamsCompleted = statistics.TeamsCompleted;
     }
 
     private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
