@@ -39,11 +39,11 @@ else if (IsAvailable)
 
         @if (IsSuccess)
         {
-            <MudAlert Severity="Severity.Success">You have successfully solved this challenge in @NumberOfAttempts attempts!</MudAlert>
+            <MudAlert Severity="Severity.Success">You have successfully solved this challenge in @NumberOfAttempts @(NumberOfAttempts == 1 ? "attempt" : "attempts")!</MudAlert>
         }
         else
         {
-            <MudAlert Severity="Severity.Normal">@(NumberOfAttempts == 0 ? "You have not started this challenge!" : $"You have attempted {NumberOfAttempts} times to solve this challenge!")</MudAlert>
+            <MudAlert Severity="Severity.Normal">@(NumberOfAttempts == 0 ? "You have not started this challenge!" : $"You have attempted {NumberOfAttempts} {(NumberOfAttempts == 1 ? "time" : "times")} to solve this challenge!")</MudAlert>
         }
 
         @if(!string.IsNullOrEmpty(Tldr))
@@ -53,7 +53,7 @@ else if (IsAvailable)
     }
     else
     {
-        <MudAlert Severity="Severity.Info" Class="my-4">You need to <MudLink Href="/login">login</MudLink> to be able to submit solutions!</MudAlert>
+        <MudAlert Severity="Severity.Info" Class="my-4">You need to <MudLink Href="/login">log in</MudLink> to be able to submit solutions!</MudAlert>
     }
 
     @foreach (var line in Description)
@@ -132,11 +132,11 @@ else if (IsAvailable)
                 <MudCardContent>
                     @if (IsSuccess)
                     {
-                        <MudAlert Severity="Severity.Success" Class="mt-n6 mb-2">You have successfully solved this challenge in @NumberOfAttempts attempts!</MudAlert>
+                        <MudAlert Severity="Severity.Success" Class="mt-n6 mb-2">You have successfully solved this challenge in @NumberOfAttempts @(NumberOfAttempts == 1 ? "attempt" : "attempts")!</MudAlert>
                     }
                     else
                     {
-                        <MudAlert Severity="Severity.Info" Class="mt-n6 mb-2">@(NumberOfAttempts == 0 ? "You have not started this challenge!" : $"You have attempted {NumberOfAttempts} times to solve this challenge!")</MudAlert>
+                        <MudAlert Severity="Severity.Info" Class="mt-n6 mb-2">@(NumberOfAttempts == 0 ? "You have not started this challenge!" : $"You have attempted {NumberOfAttempts} {(NumberOfAttempts == 1 ? "time" : "times")} to solve this challenge!")</MudAlert>
                     }
                     <MudExpansionPanels Outlined="false" Elevation="0">
                         @foreach (var submission in YourSubmissions)
@@ -190,7 +190,7 @@ else if (IsAvailable)
 }
 else
 {
-    <MudAlert Severity="Severity.Warning">The challenge with name 'Challenge @ChallengeName' could not be loaded.</MudAlert>
+    <MudAlert Severity="Severity.Warning">The challenge '@ChallengeName' could not be loaded.</MudAlert>
 }
 
 @code
@@ -355,7 +355,7 @@ else
             IsSuccess = score.IsSuccess;
             NumberOfAttempts = score.TotalAttempts;
 
-            var submissions = await Mediator.Send(new GetYourSubmissionsQuery { ChallengeName = ChallengeName = ChallengeName, TeamName = TeamName });
+            var submissions = await Mediator.Send(new GetYourSubmissionsQuery { ChallengeName = ChallengeName, TeamName = TeamName });
             YourSubmissions = submissions.YourSubmissions;
         }
     }

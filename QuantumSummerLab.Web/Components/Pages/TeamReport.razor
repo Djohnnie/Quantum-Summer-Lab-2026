@@ -21,7 +21,7 @@
 }
 else if (!IsLoggedIn)
 {
-    <MudAlert Severity="Severity.Info" Class="my-4">You need to login before accessing challenge reports.</MudAlert>
+    <MudAlert Severity="Severity.Info" Class="my-4">You need to log in before accessing challenge reports.</MudAlert>
 }
 else if (!IsAdmin)
 {
@@ -45,7 +45,7 @@ else
                     <TitleContent>
                         <div class="d-flex">
                             <MudIcon Icon="@(challenge.IsSuccess.HasValue? challenge.IsSuccess.Value? Icons.Material.Filled.Check : Icons.Material.Filled.Close : Icons.Material.Filled.Extension)" Color="@(challenge.IsSuccess.HasValue? challenge.IsSuccess.Value? Color.Success: Color.Error : Color.Default)" />
-                            <MudChip T="string" Color="@(challenge.IsSuccess.HasValue? challenge.IsSuccess.Value? Color.Success: Color.Error : Color.Default)" Class="ml-4 mr-4 mt-n1 mb-0">@challenge.Score points (@challenge.TotalAttempts attempts)</MudChip>
+                            <MudChip T="string" Color="@(challenge.IsSuccess.HasValue? challenge.IsSuccess.Value? Color.Success: Color.Error : Color.Default)" Class="ml-4 mr-4 mt-n1 mb-0">@challenge.Score points (@challenge.TotalAttempts @(challenge.TotalAttempts == 1 ? "attempt" : "attempts"))</MudChip>
                             <MudText><strong>@challenge.Name</strong> @challenge.Title</MudText>
                         </div>
                     </TitleContent>
@@ -61,11 +61,11 @@ else
                                 <MudCardContent>
                                     @if (challenge.IsSuccess.HasValue && challenge.IsSuccess.Value)
                                     {
-                                        <MudAlert Severity="Severity.Success" Class="mt-n6 mb-2">@challenge.TeamName has successfully solved this challenge in @challenge.TotalAttempts attempts!</MudAlert>
+                                        <MudAlert Severity="Severity.Success" Class="mt-n6 mb-2">@challenge.TeamName has successfully solved this challenge in @challenge.TotalAttempts @(challenge.TotalAttempts == 1 ? "attempt" : "attempts")!</MudAlert>
                                     }
                                     else
                                     {
-                                        <MudAlert Severity="Severity.Info" Class="mt-n6 mb-2">@(challenge.TotalAttempts == 0 ? $"{challenge.TeamName} has not started this challenge!" : $"{challenge.TeamName} has attempted {challenge.TotalAttempts} times to solve this challenge!")</MudAlert>
+                                        <MudAlert Severity="Severity.Info" Class="mt-n6 mb-2">@(challenge.TotalAttempts == 0 ? $"{challenge.TeamName} has not started this challenge!" : $"{challenge.TeamName} has attempted {challenge.TotalAttempts} {(challenge.TotalAttempts == 1 ? "time" : "times")} to solve this challenge!")</MudAlert>
                                     }
                                     <MudExpansionPanels Outlined="false" Elevation="0">
                                         @foreach (var submission in challenge.Submissions)

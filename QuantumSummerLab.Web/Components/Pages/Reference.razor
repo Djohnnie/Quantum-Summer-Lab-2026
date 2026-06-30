@@ -32,10 +32,10 @@
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#cnotgate"))">&nbsp;&nbsp;&nbsp;&nbsp;CNOT-gate</MudNavLink>
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#entanglement"))">&nbsp;&nbsp;&nbsp;&nbsp;Entanglement</MudNavLink>
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#teleportation"))">&nbsp;&nbsp;&nbsp;&nbsp;Teleportation</MudNavLink>
-            <MudNavLink OnClick="@((e) => OnNavigateToHeading("#qsharp"))"><strong>Q# in 15-minutes</strong></MudNavLink>
+            <MudNavLink OnClick="@((e) => OnNavigateToHeading("#qsharp"))"><strong>Q# in 15 minutes</strong></MudNavLink>
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#operations"))">&nbsp;&nbsp;&nbsp;&nbsp;Quantum operations</MudNavLink>
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#qubits"))">&nbsp;&nbsp;&nbsp;&nbsp;Working with qubits</MudNavLink>
-            <MudNavLink OnClick="@((e) => OnNavigateToHeading("#gates"))">&nbsp;&nbsp;&nbsp;&nbsp;Gate logic</MudNavLink>
+            <MudNavLink OnClick="@((e) => OnNavigateToHeading("#gates"))">&nbsp;&nbsp;&nbsp;&nbsp;Applying quantum gates</MudNavLink>
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#variables"))">&nbsp;&nbsp;&nbsp;&nbsp;Working with variables</MudNavLink>
             <MudNavLink OnClick="@((e) => OnNavigateToHeading("#debugging"))">&nbsp;&nbsp;&nbsp;&nbsp;Debugging</MudNavLink>
         </MudNavMenu>
@@ -61,7 +61,7 @@
 <MudText Class="mt-4">The solution template provides the exact Q# operation signature you must implement. Your task is to write the code body without modifying the operation signature.</MudText>
 <MudText Class="mt-4">The 'Submit your solution' section includes a text field for your code and buttons to submit or clear it.</MudText>
 <MudText Class="mt-4">When you submit a solution, it is evaluated on our servers. If all tests pass, your solution is accepted and the challenge is marked as complete. If there are issues, you will receive feedback based on the specific challenge and can try again as many times as you need.</MudText>
-<MudText Class="mt-4">Below the submission box, you will find a history of all your attempts, including the submitted Q# code and feedback received for future reference.</MudText>
+<MudText Class="mt-4">Below the submission box, you will find a history of all your attempts for future reference, including the submitted Q# code and the feedback you received.</MudText>
 <MudText Class="mt-4">You can also summon Qubit Buddy directly from the challenge page for assistance.</MudText>
 <MudText Typo="Typo.h6" Class="pt-20 mt-4" id="leaderboard">Leaderboard</MudText>
 <MudText Class="mt-4">The leaderboard displays all participating teams ranked by score and solving speed.</MudText>
@@ -74,17 +74,17 @@
 <MudText Class="mt-4">You can also access Qubit Buddy directly from any challenge page by clicking the dedicated button in the bottom-right corner.</MudText>
 <MudText Class="mt-4">Qubit Buddy can help you with:</MudText>
 <MudList Class="mt-4" T="string" Dense="true" Style="width: 100%;">
-    <MudListItem Icon="@Icons.Material.Filled.CheckCircle">Guidance on quantum logic, gates and circuits.</MudListItem>
+    <MudListItem Icon="@Icons.Material.Filled.CheckCircle">Guidance on quantum logic, gates, and circuits.</MudListItem>
     <MudListItem Icon="@Icons.Material.Filled.CheckCircle">Guidance on the Q# programming language.</MudListItem>
     <MudListItem Icon="@Icons.Material.Filled.CheckCircle">Information and guidance on the current challenge you are working on. Use it on the challenge page, or tell it the challenge code (A1..D3) you are working on.</MudListItem>
     <MudListItem Icon="@Icons.Material.Filled.CheckCircle">Information and guidance on your last attempt for a specific challenge.</MudListItem>
     <MudListItem Icon="@Icons.Material.Filled.CheckCircle">Information about the leaderboard.</MudListItem>
 </MudList>
-<MudAlert Class="mt-4" Severity="Severity.Warning">Your chat history is stored in plain text in our internal database for your convenience. Please keep this in mind while chatting and don't share anything personal, sensitive or inappropriate.</MudAlert>
+<MudAlert Class="mt-4" Severity="Severity.Warning">Your chat history is stored in plain text in our internal database for your convenience. Please keep this in mind while chatting and don't share anything personal, sensitive, or inappropriate.</MudAlert>
 
 
 <MudText Typo="Typo.h5" Class="pt-20 mb-4" id="prerequisites">Prerequisites</MudText>
-<MudText>For the best experience writing Q# code, we recommend using the Visual Studio Code IDE. You can develop and test your solutions locally before submitting them to this platform.</MudText>
+<MudText>For the best experience writing Q# code, we recommend using the Visual Studio Code editor. You can develop and test your solutions locally before submitting them to this platform.</MudText>
 <MudText Class="mt-4">Download and install Visual Studio Code along with its Q# extension to get started with Microsoft Q#:</MudText>
 <MudLink Href="https://code.visualstudio.com/" Target="_blank">Visual Studio Code (code editor with support for Q#)</MudLink>
 <br />
@@ -101,7 +101,7 @@
 <MudText>This section covers the most important quantum operations.</MudText>
 <MudText Typo="Typo.h6" Class="pt-20 mt-4" id="hgate">H-gate (Hadamard gate)</MudText>
 <MudText Class="mt-4">The Hadamard gate, based on the Hadamard transform and named after French mathematician Jacques Hadamard, is one of the most fundamental yet powerful quantum gates.</MudText>
-<MudText Class="mt-4">It manipulates a single qubit's state vector, placing it in a superposition of the |0⟩ and |1⟩ states. In circuit diagrams, it is represented as a box containing the letter H. The figure below shows the gate applied to a qubit |q⟩.</MudText>
+<MudText Class="mt-4">It manipulates a single qubit's state vector, placing it in a superposition of the |0⟩ and |1⟩ states. In circuit diagrams, it is represented as a box containing the letter H. The figure below shows the H-gate applied to a qubit |q⟩.</MudText>
 <MudImage Src="/03-01_gate-h.svg" />
 <MudText Class="mt-4">On the Bloch sphere, the Hadamard transformation appears as a π radian (180°) rotation around a diagonal axis between the x and z axes, as illustrated in the following figure.</MudText>
 <MudImage Src="/03-02_gate-h-bloch-sphere.svg" />
@@ -146,12 +146,12 @@
 <MudText Typo="Typo.h5" Class="pt-20 mb-4" id="qsharp">Q# in 15 minutes</MudText>
 <MudText>This section provides a quick introduction to the Q# programming language.</MudText>
 <MudText Typo="Typo.h6" Class="pt-20 mt-4" id="operations">Quantum operations</MudText>
-<MudText Class="mt-4">A quantum operation works similarly to functions or methods in other programming languages, with the key difference that it performs quantum operations by changing qubit states.</MudText>
+<MudText Class="mt-4">A quantum operation works similarly to functions or methods in other programming languages, with the key difference that it can manipulate the state of qubits.</MudText>
 <MudContainer Class="mt-4">
     <ThemedMarkdown Value="@_operation1" />
 </MudContainer>
 <MudText Class="mt-4">An operation begins with the keyword <code>operation</code>, followed by its unique name and a parenthesized list of arguments. Arguments are comma-separated, each consisting of a name, a colon, and its data type. The declaration ends with a colon and the return type—use <code>Unit</code> when there is no return value. The operation body is enclosed in curly braces.</MudText>
-<MudText Class="mt-4">The example above shows an operation named <code>Solve</code> with a single argument <code>a</code> of type <code>Qubit</code> and a <code>Unit</code> return type, indicating no return value.</MudText>
+<MudText Class="mt-4">The example above shows an operation named <code>Solve</code> with a single argument <code>q</code> of type <code>Qubit</code> and a <code>Unit</code> return type, indicating no return value.</MudText>
 <MudContainer Class="mt-4">
     <ThemedMarkdown Value="@_operation2" />
 </MudContainer>
