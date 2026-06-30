@@ -2,6 +2,7 @@
 using MudBlazor.Services;
 using QuantumSummerLab.Admin.Components;
 using QuantumSummerLab.Admin.Helpers;
+using QuantumSummerLab.Data.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 var app = builder.Build();
+
+// Apply any pending database migrations on startup.
+app.Services.MigrateDatabase();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
