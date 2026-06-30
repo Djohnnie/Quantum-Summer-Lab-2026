@@ -29,6 +29,7 @@ public class VerificationFeedback
 {
     public bool Valid { get; set; }
     public string Message { get; set; }
+    public string Details { get; set; }
 }
 
 public class QSharpRequest
@@ -49,6 +50,7 @@ public class QSharpFeedbackMessage
 {
     public bool Valid { get; set; }
     public string Message { get; set; }
+    public string Details { get; set; }
 }
 
 public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChallengeSolutionCommand, VerifyChallengeSolutionResponse>
@@ -143,7 +145,8 @@ public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChall
             Feedback = feedback.Messages.Select(m => new VerificationFeedback
             {
                 Valid = m.Valid,
-                Message = m.Message
+                Message = m.Message,
+                Details = m.Details
             }).ToList()
         };
     }

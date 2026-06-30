@@ -99,6 +99,10 @@ else if (IsAvailable)
                                     <MudIcon Icon="@(feedback.Valid? Icons.Material.Filled.Check : Icons.Material.Filled.Close)" Color="@(feedback.Valid? Color.Success: Color.Error)" class="mr-3"></MudIcon>
                                     <MudText Color="@(feedback.Valid? Color.Success: Color.Error)">@feedback.Message</MudText>
                                 </div>
+                                @if (!string.IsNullOrWhiteSpace(feedback.Details))
+                                {
+                                    <pre class="qsharp-error-details ml-12 mr-4">@feedback.Details</pre>
+                                }
                             }
                         </MudContainer>
                     }
@@ -180,6 +184,10 @@ else if (IsAvailable)
                                                     <MudIcon Icon="@(feedback.Valid? Icons.Material.Filled.Check : Icons.Material.Filled.Close)" Color="@(feedback.Valid? Color.Success: Color.Error)" class="mr-3"></MudIcon>
                                                     <MudText Color="@(feedback.Valid? Color.Success: Color.Error)">@feedback.Message</MudText>
                                                 </div>
+                                                @if (!string.IsNullOrWhiteSpace(feedback.Details))
+                                                {
+                                                    <pre class="qsharp-error-details ml-16 mr-4">@feedback.Details</pre>
+                                                }
                                             }
                                     </div>
                                     <ThemedMarkdown Value="@submission.ProposedSolution" />

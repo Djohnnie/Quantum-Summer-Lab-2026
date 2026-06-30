@@ -32,6 +32,7 @@ public class SubmissionFeedback
 {
     public bool Valid { get; set; }
     public string Message { get; set; }
+    public string Details { get; set; }
 }
 
 public class GetYourSubmissionsQueryHandler : IRequestHandler<GetYourSubmissionsQuery, GetYourSubmissionsResponse>
@@ -75,7 +76,8 @@ public class GetYourSubmissionsQueryHandler : IRequestHandler<GetYourSubmissions
                 Feedback = feedback.Messages.Select(x => new SubmissionFeedback
                 {
                     Valid = x.Valid,
-                    Message = x.Message
+                    Message = x.Message,
+                    Details = x.Details
                 }).ToList()
             });
         }
