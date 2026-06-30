@@ -39,59 +39,59 @@ else
                 <MudText Typo="Typo.h6">Registered teams</MudText>
             </CardHeaderContent>
         </MudCardHeader>
-        <MudTable Items="@ManagedTeams" Hover="true" Bordered="true" Striped="true">
-            <HeaderContent>
-                <MudTh>Team</MudTh>
-                <MudTh>Approved</MudTh>
-                <MudTh>Admin</MudTh>
-                <MudTh>Status</MudTh>
-                <MudTh>Submissions</MudTh>
-                <MudTh>Actions</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Team">@context.TeamName</MudTd>
-                <MudTd DataLabel="Approved">
-                    <MudChip T="string" Color="@(context.IsApproved ? Color.Success : Color.Warning)">
-                        @(context.IsApproved ? "Approved" : "Pending")
-                    </MudChip>
-                </MudTd>
-                <MudTd DataLabel="Admin">
-                    <MudChip T="string" Color="@(context.IsAdmin ? Color.Success : Color.Default)">
-                        @(context.IsAdmin ? "Admin" : "Member")
-                    </MudChip>
-                </MudTd>
-                <MudTd DataLabel="Status">
-                    <MudChip T="string" Color="@(context.IsArchived ? Color.Error : Color.Success)">
-                        @(context.IsArchived ? "Archived" : "Active")
-                    </MudChip>
-                </MudTd>
-                <MudTd DataLabel="Submissions">@context.SubmissionCount</MudTd>
-                <MudTd DataLabel="Actions">
-                    @if (!context.IsArchived)
-                    {
-                        <MudTooltip Text="Approve team">
-                            <MudIconButton Icon="@Icons.Material.Filled.CheckCircle"
-                                           Size="Size.Small"
-                                           Color="Color.Info"
-                                           Disabled="@context.IsApproved"
-                                           OnClick="@(() => ApproveTeam(context.TeamId))" />
-                        </MudTooltip>
-                        <MudTooltip Text="@(context.IsAdmin ? "Demote admin" : "Promote admin")">
-                            <MudIconButton Icon="@(context.IsAdmin ? Icons.Material.Filled.RemoveModerator : Icons.Material.Filled.AddModerator)"
-                                           Size="Size.Small"
-                                           Color="@(context.IsAdmin ? Color.Warning : Color.Success)"
-                                           OnClick="@(() => SetAdmin(context.TeamId, !context.IsAdmin))" />
-                        </MudTooltip>
-                        <MudTooltip Text="Archive team">
-                            <MudIconButton Icon="@Icons.Material.Filled.Archive"
-                                           Size="Size.Small"
-                                           Color="Color.Error"
-                                           OnClick="@(() => ArchiveTeam(context.TeamId))" />
-                        </MudTooltip>
-                    }
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
+        <MudDataGrid T="ManagedTeamDto" Items="@ManagedTeams" Dense="true" Hover="true" Bordered="true" Striped="true" SortMode="SortMode.Multiple">
+            <Columns>
+                <PropertyColumn Property="x => x.TeamName" Title="Team" />
+                <PropertyColumn Property="x => x.IsApproved" Title="Approved">
+                    <CellTemplate>
+                        <MudChip T="string" Color="@(context.Item.IsApproved ? Color.Success : Color.Warning)">
+                            @(context.Item.IsApproved ? "Approved" : "Pending")
+                        </MudChip>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.IsAdmin" Title="Admin">
+                    <CellTemplate>
+                        <MudChip T="string" Color="@(context.Item.IsAdmin ? Color.Success : Color.Default)">
+                            @(context.Item.IsAdmin ? "Admin" : "Member")
+                        </MudChip>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.IsArchived" Title="Status">
+                    <CellTemplate>
+                        <MudChip T="string" Color="@(context.Item.IsArchived ? Color.Error : Color.Success)">
+                            @(context.Item.IsArchived ? "Archived" : "Active")
+                        </MudChip>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.SubmissionCount" Title="Submissions" />
+                <TemplateColumn Title="Actions" Sortable="false">
+                    <CellTemplate>
+                        @if (!context.Item.IsArchived)
+                        {
+                            <MudTooltip Text="Approve team">
+                                <MudIconButton Icon="@Icons.Material.Filled.CheckCircle"
+                                               Size="Size.Small"
+                                               Color="Color.Info"
+                                               Disabled="@context.Item.IsApproved"
+                                               OnClick="@(() => ApproveTeam(context.Item.TeamId))" />
+                            </MudTooltip>
+                            <MudTooltip Text="@(context.Item.IsAdmin ? "Demote admin" : "Promote admin")">
+                                <MudIconButton Icon="@(context.Item.IsAdmin ? Icons.Material.Filled.RemoveModerator : Icons.Material.Filled.AddModerator)"
+                                               Size="Size.Small"
+                                               Color="@(context.Item.IsAdmin ? Color.Warning : Color.Success)"
+                                               OnClick="@(() => SetAdmin(context.Item.TeamId, !context.Item.IsAdmin))" />
+                            </MudTooltip>
+                            <MudTooltip Text="Archive team">
+                                <MudIconButton Icon="@Icons.Material.Filled.Archive"
+                                               Size="Size.Small"
+                                               Color="Color.Error"
+                                               OnClick="@(() => ArchiveTeam(context.Item.TeamId))" />
+                            </MudTooltip>
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
     </MudCard>
 }
 

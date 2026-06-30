@@ -32,40 +32,38 @@ else
                 <MudText Typo="Typo.h6">Registered teams</MudText>
             </CardHeaderContent>
         </MudCardHeader>
-        <MudTable Items="@ManagedTeams" Hover="true" Bordered="true" Striped="true">
-            <HeaderContent>
-                <MudTh>Team</MudTh>
-                <MudTh>Status</MudTh>
-                <MudTh>Total score</MudTh>
-                <MudTh>Succeeded / failed</MudTh>
-                <MudTh>Submissions</MudTh>
-                <MudTh>Actions</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Team">@context.TeamName</MudTd>
-                <MudTd DataLabel="Status">
-                    <MudChip T="string" Color="@(context.IsArchived ? Color.Error : Color.Success)">
-                        @(context.IsArchived ? "Archived" : "Active")
-                    </MudChip>
-                </MudTd>
-                <MudTd DataLabel="Total score">@context.TotalScore</MudTd>
-                <MudTd DataLabel="Succeeded / failed">
-                    <MudText Color="Color.Success" Typo="Typo.body2" Class="d-inline">@context.ChallengesSucceeded</MudText>
-                    <span class="mx-1">/</span>
-                    <MudText Color="Color.Error" Typo="Typo.body2" Class="d-inline">@context.ChallengesFailed</MudText>
-                </MudTd>
-                <MudTd DataLabel="Submissions">@context.SubmissionCount</MudTd>
-                <MudTd DataLabel="Actions">
-                    <MudButton Variant="Variant.Filled"
-                               Size="Size.Small"
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.Assessment"
-                               Href="@($"/reports/{context.TeamId}")">
-                        View report
-                    </MudButton>
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
+        <MudDataGrid T="ManagedTeamDto" Items="@ManagedTeams" Dense="true" Hover="true" Bordered="true" Striped="true" SortMode="SortMode.Multiple">
+            <Columns>
+                <PropertyColumn Property="x => x.TeamName" Title="Team" />
+                <PropertyColumn Property="x => x.IsArchived" Title="Status">
+                    <CellTemplate>
+                        <MudChip T="string" Color="@(context.Item.IsArchived ? Color.Error : Color.Success)">
+                            @(context.Item.IsArchived ? "Archived" : "Active")
+                        </MudChip>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.TotalScore" Title="Total score" />
+                <PropertyColumn Property="x => x.ChallengesSucceeded" Title="Succeeded / failed">
+                    <CellTemplate>
+                        <MudText Color="Color.Success" Typo="Typo.body2" Class="d-inline">@context.Item.ChallengesSucceeded</MudText>
+                        <span class="mx-1">/</span>
+                        <MudText Color="Color.Error" Typo="Typo.body2" Class="d-inline">@context.Item.ChallengesFailed</MudText>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.SubmissionCount" Title="Submissions" />
+                <TemplateColumn Title="Actions" Sortable="false">
+                    <CellTemplate>
+                        <MudButton Variant="Variant.Filled"
+                                   Size="Size.Small"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Assessment"
+                                   Href="@($"/reports/{context.Item.TeamId}")">
+                            View report
+                        </MudButton>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
     </MudCard>
 }
 
