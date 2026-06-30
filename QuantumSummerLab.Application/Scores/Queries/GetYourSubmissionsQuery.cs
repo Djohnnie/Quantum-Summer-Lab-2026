@@ -24,6 +24,7 @@ public class YourSubmission
     public bool IsSuccessful { get; set; }
     public DateTime SubmissionTimestamp { get; set; }
     public string ProposedSolution { get; set; }
+    public string Code { get; set; }
     public List<SubmissionFeedback> Feedback { get; set; }
 }
 
@@ -63,11 +64,13 @@ public class GetYourSubmissionsQueryHandler : IRequestHandler<GetYourSubmissions
         foreach (var score in scores)
         {
             var feedback = string.IsNullOrEmpty(score.Feedback) ? new QSharpFeedback() : JsonSerializer.Deserialize<QSharpFeedback>(score.Feedback);
+            var code = score.ProposedSolution.FromBase64String();
 
             submissions.Add(new YourSubmission
             {
                 IsSuccessful = score.IsSuccessful,
-                ProposedSolution = $"```js{Environment.NewLine}{score.ProposedSolution.FromBase64String()}{Environment.NewLine}```",
+                ProposedSolution = $"```js{Environment.NewLine}{code}{Environment.NewLine}```",
+                Code = code,
                 SubmissionTimestamp = score.SubmissionTimestamp,
                 Feedback = feedback.Messages.Select(x => new SubmissionFeedback
                 {
