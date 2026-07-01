@@ -14,45 +14,47 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 <CascadingValue Value="_isDarkMode" Name="IsDarkMode">
-<MudLayout>
-    <MudAppBar Elevation="0" Fixed="true">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudIcon Icon="@Icons.Material.Filled.Webhook" Class="ml-3" />
-        <MudHidden Breakpoint="Breakpoint.Xs">
-            <MudLink Href="/" Typo="Typo.h6" Class="ml-3" Color="Color.Default" Style="text-decoration: none;">Quantum Hands-on Lab</MudLink>
-        </MudHidden>
-        <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
-            <MudLink Href="/" Typo="Typo.h6" Class="ml-3" Color="Color.Default" Style="text-decoration: none;">Quantum</MudLink>
-        </MudHidden>
-        <MudSpacer />
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-        <MudTooltip Text="@(string.IsNullOrEmpty(TeamName) ? "Login" : "Logout")">
-            <MudFab StartIcon="@Icons.Material.Filled.AccountBox" Color="Color.Inherit" Size="Size.Medium" DropShadow="false" Label="@(string.IsNullOrEmpty(TeamName) ? "" : TeamName)" OnClick="@Login" />
-        </MudTooltip>
-    </MudAppBar>
-    <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="0">
-        <NavMenu />
-        <MudSpacer />
-        <MudText Typo="Typo.body2" Class="ml-2 mb-2 mt-4">v0.6 - powered by .NET 10</MudText>
-    </MudDrawer>
-    @if (_copilotEnabled)
-    {
-        <MudHidden Breakpoint="Breakpoint.SmAndDown" HiddenChanged="@CopilotHiddenChanged">
-            <MudDrawer @bind-Open="_copilotOpen" Anchor="Anchor.End" ClipMode="DrawerClipMode.Always" Variant="@DrawerVariant.Persistent" Width="40%" Elevation="0">
-                <MudContainer Class="copilot-drawer mb-12">
-                    @if (_copilotOpen)
-                    {
-                        <MudFab Style="position:fixed; bottom:10px; right:10px; z-index:666;" Color="@Color.Error" StartIcon="@Icons.Material.Filled.Close" DropShadow="false" OnClick="@CloseCopilot" />
-                    }
-                    <CopilotPane @ref="_copilotPane" TeamName="@TeamName" />
-                </MudContainer>
-            </MudDrawer>
-        </MudHidden>
-    }
-    <MudMainContent Class="pa-4 pa-sm-8 pa-md-12 mt-12">
-        @Body
-    </MudMainContent>
-</MudLayout>
+    <MudLayout>
+        <MudAppBar Elevation="0" Fixed="true">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            <MudIcon Icon="@Icons.Material.Filled.Webhook" Class="ml-3" />
+            <MudHidden Breakpoint="Breakpoint.Xs">
+                <MudLink Href="/" Typo="Typo.h6" Class="ml-3" Color="Color.Default" Style="text-decoration: none;">Quantum Hands-on Lab</MudLink>
+            </MudHidden>
+            <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+                <MudLink Href="/" Typo="Typo.h6" Class="ml-3" Color="Color.Default" Style="text-decoration: none;">Quantum</MudLink>
+            </MudHidden>
+            <MudSpacer />
+            <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+            <MudTooltip Text="@(string.IsNullOrEmpty(TeamName) ? "Login" : "Logout")">
+                <MudFab StartIcon="@Icons.Material.Filled.AccountBox" Color="Color.Inherit" Size="Size.Medium" DropShadow="false" Label="@(string.IsNullOrEmpty(TeamName) ? "" : TeamName)" OnClick="@Login" />
+            </MudTooltip>
+        </MudAppBar>
+        <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="0">
+            <NavMenu />
+            <MudSpacer />
+            <MudText Typo="Typo.body2" Class="ml-2 mt-4">v2026.7</MudText>
+            <MudText Typo="Typo.body2" Class="ml-2">Powered by .NET 10 and QSharpBridge</MudText>
+            <MudText Typo="Typo.body2" Class="ml-2 mb-2">© 2026 Johnny Hooyberghs</MudText>
+        </MudDrawer>
+        @if (_copilotEnabled)
+        {
+            <MudHidden Breakpoint="Breakpoint.SmAndDown" HiddenChanged="@CopilotHiddenChanged">
+                <MudDrawer @bind-Open="_copilotOpen" Anchor="Anchor.End" ClipMode="DrawerClipMode.Always" Variant="@DrawerVariant.Persistent" Width="40%" Elevation="0">
+                    <MudContainer Class="copilot-drawer mb-12">
+                        @if (_copilotOpen)
+                        {
+                            <MudFab Style="position:fixed; bottom:10px; right:10px; z-index:666;" Color="@Color.Error" StartIcon="@Icons.Material.Filled.Close" DropShadow="false" OnClick="@CloseCopilot" />
+                        }
+                        <CopilotPane @ref="_copilotPane" TeamName="@TeamName" />
+                    </MudContainer>
+                </MudDrawer>
+            </MudHidden>
+        }
+        <MudMainContent Class="pa-4 pa-sm-8 pa-md-12 mt-12">
+            @Body
+        </MudMainContent>
+    </MudLayout>
 </CascadingValue>
 
 <div id="blazor-error-ui" data-nosnippet>
@@ -73,7 +75,7 @@
     private bool _shouldRefreshCodeTheme;
 
     private CopilotPane _copilotPane;
-    
+
     private string TeamName { get; set; }
 
     protected override void OnInitialized()
