@@ -82,8 +82,9 @@ never `new HttpClient()`.
 
 ## Challenges
 
-- Challenge content is defined as static `Challenge` objects (with Base64 fields) in `QuantumSummerLab.Tools/Challenges.cs` and seeded by running the Tools console app (option 3 "Add challenges"). Names are `0, A1..A3, B1..B3, C1..C3, D1..D3` (`Level` 0–4).
-- `_challenges/<id>/` holds standalone, runnable Q# reference projects (`qsharp.json` + `src/Main.qs`).
+- `QuantumSummerLab.Tools/Challenges.cs` is **auto-generated** — do not hand-edit it. It's seeded into the DB by running the Tools console app (option 3 "Add challenges"). Names are `0, A1..A3, B1..B3, C1..C3, D1..D3` (`Level` 0–4).
+- `_challenges/<id>/` is the source of truth: a standalone, runnable Q# project (`qsharp.json` + `src/Main.qs`). Each `Main.qs` has a `CHALLENGE METADATA` comment block at the top (Title, Description, Tldr, etc.) and marks the reference solution with `// ===SOLVE-START===` / `// ===SOLVE-END===`. `SolutionTemplate` and `VerificationTemplate` are derived from the code, not stored.
+- After editing anything under `_challenges/`, run `python _challenges/generate_challenges.py` to regenerate `Challenges.cs` (`--check` verifies without writing).
 
 ## Qubit Buddy (AI assistant)
 

@@ -1,3 +1,46 @@
+// ============================================================
+// CHALLENGE METADATA
+// Edit the fields below directly. SolutionTemplate and
+// VerificationTemplate are NOT stored here - they are derived
+// automatically from the code below (see the SOLVE markers).
+// After editing, run `python _challenges/generate_challenges.py`
+// to regenerate QuantumSummerLab.Tools/Challenges.cs.
+// ============================================================
+// Name = "D2"
+// Title = "Generate generalized W-state"
+// Description = "Your task is to create a generalized W state on n qubits where n = 2^k (1 ≤ k ≤ 4) from zero |0..0⟩ state.[BR]The classic W-state is defined as |W⟩ = 1/√3 (|100⟩ + |010⟩ + |001⟩) for n = 3, which is a helpful reference but is not itself a valid input for this challenge since 3 is not a power of 2.[BR]The generalized W-state you need to implement is defined as |W⟩ = 1/√n (|10..0⟩ + |01..0⟩ + ... + |00..1⟩), where n is always a power of 2 in the range n = 2^k (1 ≤ k ≤ 4), i.e. n ∈ {2, 4, 8, 16}.[BR]You have to implement the Solve operation which takes an array of n qubits in state |0..0⟩ and you need to create the W-state on them.[BR]The operation should have the following signature:"
+// Tldr = "You should implement the empty Solve operation below and prepare a generalized W-state on the provided 2^k (1 ≤ k ≤ 4) qubits."
+// ExampleDescription = ""
+// ExampleCode = ""
+// ExpectedOutput = ""
+// ===EXPECTED-STATES-START===
+// [
+//   {
+//     "id": "|0001⟩",
+//     "amplitudeReal": 0.5,
+//     "amplitudeImaginary": 0
+//   },
+//   {
+//     "id": "|0010⟩",
+//     "amplitudeReal": 0.5,
+//     "amplitudeImaginary": 0
+//   },
+//   {
+//     "id": "|0100⟩",
+//     "amplitudeReal": 0.5,
+//     "amplitudeImaginary": 0
+//   },
+//   {
+//     "id": "|1000⟩",
+//     "amplitudeReal": 0.5,
+//     "amplitudeImaginary": 0
+//   }
+// ]
+// ===EXPECTED-STATES-END===
+// CopilotInstructions = ""
+// Level = 4
+// ============================================================
+
 import Std.Arithmetic.*;
 import Std.Canon.*;
 import Std.Diagnostics.*;
@@ -12,12 +55,7 @@ operation Main() : Unit
     ResetAll(qs);
 }
 
-// Generate generalized W-state.
-// Your task is to create Greenberger–Horne–Zeilinger (W) state on n qubits where n = 2^k (1 ≤ k ≤ 4) from zero |0..0⟩ state.
-// The W-state is defined as |W⟩ = 1/√3 (|100⟩ + |010⟩ + |001⟩) for n = 3.
-// The generalized W-state is defined as |W⟩ = 1/√n (|10..0⟩ + |01..0⟩ + ... + |00..1⟩) for n > 3 where n = 2^k (1 ≤ k ≤ 4).
-// You have to implement the Solve operation which takes an array of n qubits in state |0..0⟩ and you need to create the W-state on them.
-// The operation should have the following signature:
+// ===SOLVE-START===
 operation Solve (qs : Qubit[]) : Unit
 {
     let n = Length(qs);
@@ -46,19 +84,4 @@ operation Solve (qs : Qubit[]) : Unit
         }
     }
 }
-
-// public static Challenge CHALLENGE_D2 = new Challenge
-// {
-//     Name = "D2",
-//     Title = "Generate generalized W-state",
-//     Description = "Your task is to create Greenberger–Horne–Zeilinger (W) state on n qubits where n = 2^k (1 ≤ k ≤ 4) from zero |0..0⟩ state.[BR]The W-state is defined as |W⟩ = 1/√3 (|100⟩ + |010⟩ + |001⟩) for n = 3.[BR]The generalized W-state is defined as |W⟩ = 1/√n (|10..0⟩ + |01..0⟩ + ... + |00..1⟩) for n > 3 where n = 2^k (1 ≤ k ≤ 4).[BR]You have to implement the Solve operation which takes an array of n qubits in state |0..0⟩ and you need to create the W-state on them.[BR]The operation should have the following signature:",
-//     Tldr = "You should implement the empty Solve operation below and prepare a generalized W-state on the provided 2^k (1 ≤ k ≤ 4) qubits.",
-//     SolutionTemplate = "b3BlcmF0aW9uIFNvbHZlIChxcyA6IFF1Yml0W10pIDogVW5pdAp7CiAgICAvLyBZb3VyIHNvbHV0aW9uIGxvZ2ljIGdvZXMgaGVyZS4KfQ==",
-//     ExampleDescription = "",
-//     ExampleCode = "",
-//     VerificationTemplate = "aW1wb3J0IFN0ZC5Bcml0aG1ldGljLio7CmltcG9ydCBTdGQuQ2Fub24uKjsKaW1wb3J0IFN0ZC5EaWFnbm9zdGljcy4qOwppbXBvcnQgU3RkLk1hdGguKjsKaW1wb3J0IFN0ZC5NZWFzdXJlbWVudC4qOwoKb3BlcmF0aW9uIE1haW4oKSA6IFVuaXQKewogICAgdXNlIHFzID0gUXViaXRbNF07CiAgICBTb2x2ZShxcyk7CiAgICBEdW1wUmVnaXN0ZXIocXMpOwogICAgUmVzZXRBbGwocXMpOwp9Cgo8PFNPTFZFPj4=",
-//     ExpectedOutput = "",
-//     ExpectedStates = "WwogIHsKICAgICJpZCI6ICJ8MDAwMeKfqSIsCiAgICAiYW1wbGl0dWRlUmVhbCI6IDAuNSwKICAgICJhbXBsaXR1ZGVJbWFnaW5hcnkiOiAwCiAgfSwKICB7CiAgICAiaWQiOiAifDAwMTDin6kiLAogICAgImFtcGxpdHVkZVJlYWwiOiAwLjUsCiAgICAiYW1wbGl0dWRlSW1hZ2luYXJ5IjogMAogIH0sCiAgewogICAgImlkIjogInwwMTAw4p+pIiwKICAgICJhbXBsaXR1ZGVSZWFsIjogMC41LAogICAgImFtcGxpdHVkZUltYWdpbmFyeSI6IDAKICB9LAogIHsKICAgICJpZCI6ICJ8MTAwMOKfqSIsCiAgICAiYW1wbGl0dWRlUmVhbCI6IDAuNSwKICAgICJhbXBsaXR1ZGVJbWFnaW5hcnkiOiAwCiAgfQpd",
-//     CopilotInstructions = "",
-//     Level = 4
-// };
+// ===SOLVE-END===

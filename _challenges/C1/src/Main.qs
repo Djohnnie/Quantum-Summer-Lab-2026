@@ -1,3 +1,36 @@
+// ============================================================
+// CHALLENGE METADATA
+// Edit the fields below directly. SolutionTemplate and
+// VerificationTemplate are NOT stored here - they are derived
+// automatically from the code below (see the SOLVE markers).
+// After editing, run `python _challenges/generate_challenges.py`
+// to regenerate QuantumSummerLab.Tools/Challenges.cs.
+// ============================================================
+// Name = "C1"
+// Title = "Generate GHZ state"
+// Description = "Your task is to create a Greenberger–Horne–Zeilinger (GHZ) state on n qubits (1 ≤ n ≤ 8) in zero |0..0⟩ state.[BR]The GHZ state is defined as |GHZ⟩ = 1/√2 (|0..0⟩ + |1..1⟩).[BR]You have to implement an operation which takes an array of n qubits and you need to create the GHZ state on them. The operation should have the following signature:"
+// Tldr = "You should implement the empty Solve operation below and prepare the Greenberger–Horne–Zeilinger (GHZ) state on the provided qubits."
+// ExampleDescription = ""
+// ExampleCode = ""
+// ExpectedOutput = "true"
+// ===EXPECTED-STATES-START===
+// [
+//   {
+//     "id": "|00000000⟩",
+//     "amplitudeReal": 0.7071,
+//     "amplitudeImaginary": 0
+//   },
+//   {
+//     "id": "|11111111⟩",
+//     "amplitudeReal": 0.7071,
+//     "amplitudeImaginary": 0
+//   }
+// ]
+// ===EXPECTED-STATES-END===
+// CopilotInstructions = ""
+// Level = 3
+// ============================================================
+
 import Std.Arithmetic.*;
 import Std.Canon.*;
 import Std.Diagnostics.*;
@@ -39,11 +72,7 @@ operation Expected (qs : Qubit[]) : Unit is Adj
     }
 }
 
-// Generate GHZ state
-// Your task is to create Greenberger–Horne–Zeilinger (GHZ) state on N qubits (1 ≤ N ≤ 8) in zero |0..0⟩ state.
-// The GHZ state is defined as |GHZ⟩ = 1/√2 (|0..0⟩ + |1..1⟩).
-// You have to implement an operation which takes an array of N qubits and you need to create the GHZ state on them. The operation should have the following signature:
-
+// ===SOLVE-START===
 operation Solve (qs : Qubit[]) : Unit
 {
     H(qs[0]);
@@ -52,19 +81,4 @@ operation Solve (qs : Qubit[]) : Unit
         CNOT(qs[0], qs[i]);
     }
 }
-
-// public static Challenge CHALLENGE_C1 = new Challenge
-// {
-//     Name = "C1",
-//     Title = "Generate GHZ state",
-//     Description = "Your task is to create Greenberger–Horne–Zeilinger (GHZ) state on N qubits (1 ≤ N ≤ 8) in zero |0..0⟩ state.[BR]The GHZ state is defined as |GHZ⟩ = 1/√2 (|0..0⟩ + |1..1⟩).[BR]You have to implement an operation which takes an array of N qubits and you need to create the GHZ state on them. The operation should have the following signature:",
-//     Tldr = "You should implement the empty Solve operation below and prepare the Greenberger–Horne–Zeilinger (GHZ) on the provided qubits.",
-//     SolutionTemplate = "b3BlcmF0aW9uIFNvbHZlIChxcyA6IFF1Yml0W10pIDogVW5pdAp7CiAgICAvLyBZb3VyIHNvbHV0aW9uIGxvZ2ljIGdvZXMgaGVyZS4KfQ==",
-//     ExampleDescription = "",
-//     ExampleCode = "",
-//     VerificationTemplate = "aW1wb3J0IFN0ZC5Bcml0aG1ldGljLio7CmltcG9ydCBTdGQuQ2Fub24uKjsKaW1wb3J0IFN0ZC5EaWFnbm9zdGljcy4qOwppbXBvcnQgU3RkLk1hdGguKjsKaW1wb3J0IFN0ZC5NZWFzdXJlbWVudC4qOwoKb3BlcmF0aW9uIE1haW4oKSA6IEJvb2wKewogICAgbXV0YWJsZSByZXN1bHRDb3VudGVyID0gMDsKCiAgICBmb3IgaSBpbiAxLi44CiAgICB7CiAgICAgICAgbGV0IHJlc3VsdCA9IENoZWNrT3BlcmF0aW9uc0FyZUVxdWFsKGksIFNvbHZlLCBFeHBlY3RlZCk7CiAgICAgICAgc2V0IHJlc3VsdENvdW50ZXIgKz0gcmVzdWx0ID8gMSB8IDA7CiAgICB9CgogICAgTG9nTWVzc2FnZShyZXN1bHRDb3VudGVyID09IDgsICJZb3UgaGF2ZSBzdWNjZXNzZnVsbHkgZ2VuZXJhdGVkIHRoZSBHSFogc3RhdGUiLCAiWW91IGhhdmUgZmFpbGVkIHRvIGdlbmVyYXRlIHRoZSBHSFogc3RhdGUiKTsKCiAgICB1c2UgcXMgPSBRdWJpdFs4XTsKICAgIFNvbHZlKHFzKTsKICAgIER1bXBSZWdpc3Rlcihxcyk7CiAgICBSZXNldEFsbChxcyk7CgogICAgcmV0dXJuIHJlc3VsdENvdW50ZXIgPT0gODsKfQoKZnVuY3Rpb24gTG9nTWVzc2FnZShpc1ZhbGlkOiBCb29sLCB2YWxpZE1lc3NhZ2U6IFN0cmluZywgaW52YWxpZE1lc3NhZ2U6IFN0cmluZykgOiAoKQp7CiAgICBsZXQgbWVzc2FnZSA9ICJ7XCJ2YWxpZFwiOiAiICsgKGlzVmFsaWQgPyAidHJ1ZSIgfCAiZmFsc2UiKSArICIsIFwibWVzc2FnZVwiOiBcIiIgKyAoaXNWYWxpZCA/IHZhbGlkTWVzc2FnZSB8IGludmFsaWRNZXNzYWdlKSArICJcIn0iOwogICAgTWVzc2FnZShtZXNzYWdlKTsKfQoKb3BlcmF0aW9uIEV4cGVjdGVkIChxcyA6IFF1Yml0W10pIDogVW5pdCBpcyBBZGoKewogICAgSChxc1swXSk7CiAgICBmb3IgaSBpbiAxIC4uIExlbmd0aChxcykgLSAxCiAgICB7CiAgICAgICAgQ05PVChxc1swXSwgcXNbaV0pOwogICAgfQp9Cgo8PFNPTFZFPj4=",
-//     ExpectedOutput = "true",
-//     ExpectedStates = "WwogIHsKICAgICJpZCI6ICJ8MDAwMDAwMDDin6kiLAogICAgImFtcGxpdHVkZVJlYWwiOiAwLjcwNzEsCiAgICAiYW1wbGl0dWRlSW1hZ2luYXJ5IjogMAogIH0sCiAgewogICAgImlkIjogInwxMTExMTExMeKfqSIsCiAgICAiYW1wbGl0dWRlUmVhbCI6IDAuNzA3MSwKICAgICJhbXBsaXR1ZGVJbWFnaW5hcnkiOiAwCiAgfQpd",
-//     CopilotInstructions = "",
-//     Level = 3
-// };
+// ===SOLVE-END===
