@@ -37,8 +37,22 @@
                 <MudTextField @bind-Value="Password" Class="my-4" Label="Password" spellcheck="false" InputType="InputType.Password" Variant="Variant.Outlined" Immediate="true" OnKeyUp="@OnKeyUp"></MudTextField>
             </MudCardContent>
             <MudCardActions>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Success" OnClick="@Authenticate" Class="ml-2 mb-2 mr-2">Login</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.GroupAdd" Color="Color.Primary" OnClick="@Register" Class="ml-2 mb-2">Register</MudButton>
+                @if (IsAuthenticating)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="true" Class="ml-2 mb-2 mr-2"><MudProgressCircular Class="ml-n2 mr-2" Indeterminate="true" Size="Size.Small" Color="Color.Default" />Login</MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" Color="Color.Success" OnClick="@Authenticate" Disabled="@IsRegistering" Class="ml-2 mb-2 mr-2">Login</MudButton>
+                }
+                @if (IsRegistering)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="true" Class="ml-2 mb-2"><MudProgressCircular Class="ml-n2 mr-2" Indeterminate="true" Size="Size.Small" Color="Color.Default" />Register</MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.GroupAdd" Color="Color.Primary" OnClick="@Register" Disabled="@IsAuthenticating" Class="ml-2 mb-2">Register</MudButton>
+                }
             </MudCardActions>
         </MudCard>
     </MudContainer>

@@ -14,6 +14,8 @@ public partial class Login
     private string InfoMessage { get; set; } = string.Empty;
     private string TeamName { get; set; } = string.Empty;
     private string Password { get; set; } = string.Empty;
+    private bool IsAuthenticating { get; set; }
+    private bool IsRegistering { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -29,8 +31,15 @@ public partial class Login
 
     protected async Task Authenticate()
     {
+        if (IsAuthenticating || IsRegistering)
+        {
+            return;
+        }
+
         ErrorMessage = string.Empty;
         InfoMessage = string.Empty;
+        IsAuthenticating = true;
+        StateHasChanged();
 
         var response = await Mediator.Send(new LoginCommand
         {
@@ -47,14 +56,22 @@ public partial class Login
         else
         {
             ErrorMessage = response.ErrorMessage;
+            IsAuthenticating = false;
             StateHasChanged();
         }
     }
 
     protected async Task Register()
     {
+        if (IsAuthenticating || IsRegistering)
+        {
+            return;
+        }
+
         ErrorMessage = string.Empty;
         InfoMessage = string.Empty;
+        IsRegistering = true;
+        StateHasChanged();
 
         var response = await Mediator.Send(new RegisterCommand
         {
@@ -72,11 +89,13 @@ public partial class Login
         {
             Password = string.Empty;
             InfoMessage = response.ErrorMessage;
+            IsRegistering = false;
             StateHasChanged();
         }
         else
         {
             ErrorMessage = response.ErrorMessage;
+            IsRegistering = false;
             StateHasChanged();
         }
     }
