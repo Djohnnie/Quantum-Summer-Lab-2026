@@ -18,6 +18,14 @@ public partial class Leaderboard
         }
     }
 
+    private static string GetMedalStyle(int position) => position switch
+    {
+        1 => "background-color:#FFD700;color:#5c4400;",
+        2 => "background-color:#C0C0C0;color:#3a3a3a;",
+        3 => "background-color:#CD7F32;color:#ffffff;",
+        _ => string.Empty,
+    };
+
     private bool FilterFunc(LeaderboardEntry element) => Filter(element, SearchString);
 
     private bool Filter(LeaderboardEntry entry, string searchString)

@@ -29,7 +29,14 @@
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Position">
-                    <MudChip T="string" Color="Color.Primary">@context.Position</MudChip>
+                    @if (context.Position <= 3)
+                    {
+                        <MudChip T="string" Icon="@Icons.Material.Filled.EmojiEvents" Style="@GetMedalStyle(context.Position)">@context.Position</MudChip>
+                    }
+                    else
+                    {
+                        <MudChip T="string" Color="Color.Primary">@context.Position</MudChip>
+                    }
                 </MudTd>
                 <MudTd DataLabel="Team"><strong>@context.TeamName</strong></MudTd>
                 <MudTd DataLabel="Score">
