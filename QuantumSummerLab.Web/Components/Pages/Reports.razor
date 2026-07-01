@@ -26,6 +26,11 @@ else if (!IsAdmin)
 }
 else
 {
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <MudAlert Severity="@(IsErrorMessage ? Severity.Error : Severity.Success)" Class="my-4">@Message</MudAlert>
+    }
+
     <MudCard Outlined="true" Class="mt-6">
         <MudCardHeader>
             <CardHeaderContent>
@@ -53,13 +58,19 @@ else
                 <PropertyColumn Property="x => x.SubmissionCount" Title="Submissions" />
                 <TemplateColumn Title="Actions" Sortable="false">
                     <CellTemplate>
-                        <MudButton Variant="Variant.Filled"
-                                   Size="Size.Small"
-                                   Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.Assessment"
-                                   Href="@($"/reports/{context.Item.TeamId}")">
-                            View report
-                        </MudButton>
+                        <MudTooltip Text="View report">
+                            <MudIconButton Icon="@Icons.Material.Filled.Assessment"
+                                           Size="Size.Small"
+                                           Color="Color.Primary"
+                                           Href="@($"/reports/{context.Item.TeamId}")" />
+                        </MudTooltip>
+                        <MudTooltip Text="Reset all challenges (removes all submissions)">
+                            <MudIconButton Icon="@Icons.Material.Filled.RestartAlt"
+                                           Size="Size.Small"
+                                           Color="Color.Error"
+                                           Disabled="@(context.Item.SubmissionCount == 0)"
+                                           OnClick="@(() => ResetAllChallenges(context.Item.TeamId))" />
+                        </MudTooltip>
                     </CellTemplate>
                 </TemplateColumn>
             </Columns>

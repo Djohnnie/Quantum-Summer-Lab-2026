@@ -33,6 +33,11 @@ else if (TeamNotFound)
 }
 else
 {
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <MudAlert Severity="@(IsErrorMessage ? Severity.Error : Severity.Success)" Class="my-4">@Message</MudAlert>
+    }
+
     <MudText Typo="Typo.h6" Class="mb-4">@TeamName</MudText>
 
     @foreach (var group in _challenges)
@@ -43,10 +48,20 @@ else
             {
                 <MudExpansionPanel>
                     <TitleContent>
-                        <div class="d-flex">
+                        <div class="d-flex align-center" style="width: 100%;">
                             <MudIcon Icon="@(challenge.IsSuccess.HasValue? challenge.IsSuccess.Value? Icons.Material.Filled.Check : Icons.Material.Filled.Close : Icons.Material.Filled.Extension)" Color="@(challenge.IsSuccess.HasValue? challenge.IsSuccess.Value? Color.Success: Color.Error : Color.Default)" />
                             <MudChip T="string" Color="@(challenge.IsSuccess.HasValue? challenge.IsSuccess.Value? Color.Success: Color.Error : Color.Default)" Class="ml-4 mr-4 mt-n1 mb-0">@challenge.Score points (@challenge.TotalAttempts @(challenge.TotalAttempts == 1 ? "attempt" : "attempts"))</MudChip>
                             <MudText><strong>@challenge.Name</strong> @challenge.Title</MudText>
+                            <MudSpacer />
+                            <div @onclick:stopPropagation="true">
+                                <MudTooltip Text="Reset challenge (removes all submissions)">
+                                    <MudIconButton Icon="@Icons.Material.Filled.RestartAlt"
+                                                   Size="Size.Small"
+                                                   Color="Color.Error"
+                                                   Disabled="@(challenge.TotalAttempts == 0)"
+                                                   OnClick="@(() => ResetChallenge(challenge))" />
+                                </MudTooltip>
+                            </div>
                         </div>
                     </TitleContent>
                     <ChildContent>

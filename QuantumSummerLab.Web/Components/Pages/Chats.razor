@@ -45,13 +45,12 @@ else
                 <PropertyColumn Property="x => x.MessagesSent" Title="Messages sent" />
                 <TemplateColumn Title="Actions" Sortable="false">
                     <CellTemplate>
-                        <MudButton Variant="Variant.Filled"
-                                   Size="Size.Small"
-                                   Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.Forum"
-                                   Href="@($"/chats/{context.Item.TeamId}")">
-                            View chat history
-                        </MudButton>
+                        <MudTooltip Text="View chat history">
+                            <MudIconButton Icon="@Icons.Material.Filled.Forum"
+                                           Size="Size.Small"
+                                           Color="Color.Primary"
+                                           Href="@($"/chats/{context.Item.TeamId}")" />
+                        </MudTooltip>
                     </CellTemplate>
                 </TemplateColumn>
             </Columns>

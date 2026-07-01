@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using QuantumSummerLab.Application.Challenges.Queries;
+using QuantumSummerLab.Application.Scores.Commands;
 using QuantumSummerLab.Application.Scores.Queries;
 using QuantumSummerLab.Application.Teams.Commands;
 using QuantumSummerLab.Application.Teams.Queries;
@@ -16,7 +17,10 @@ public partial class TeamReport
     private bool IsLoggedIn { get; set; }
     private bool IsAdmin { get; set; }
     private bool TeamNotFound { get; set; }
+    private bool IsErrorMessage { get; set; }
+    private string Message { get; set; } = string.Empty;
     private string TeamName { get; set; } = string.Empty;
+    private AuthenticationToken? AuthToken { get; set; }
 
     private List<ChallengeGroup> _challenges =
         [
@@ -83,6 +87,8 @@ public partial class TeamReport
             return;
         }
 
+        AuthToken = authToken.Value;
+
         if (!Guid.TryParse(TeamId, out var teamId))
         {
             TeamNotFound = true;
@@ -126,44 +132,74 @@ public partial class TeamReport
         {
             foreach (var challenge in group.Challenges)
             {
-                var challengeResponse = await Mediator.Send(new GetChallengeByNameQuery { ChallengeName = challenge.Name });
-                if (challengeResponse != null)
-                {
-                    challenge.Title = challengeResponse.Title;
-                    StateHasChanged();
-                }
-
-                var scoreResponse = await Mediator.Send(new GetYourScoreQuery { ChallengeName = challenge.Name, TeamName = TeamName });
-                if (scoreResponse != null)
-                {
-                    challenge.TeamName = TeamName;
-                    challenge.IsSuccess = scoreResponse.TotalAttempts == 0 ? null : scoreResponse.IsSuccess;
-                    challenge.TotalAttempts = scoreResponse.TotalAttempts;
-                    challenge.Score = scoreResponse.Score;
-                }
-
-                var submissionsResponse = await Mediator.Send(new GetYourSubmissionsQuery { ChallengeName = challenge.Name, TeamName = TeamName });
-                if (submissionsResponse != null)
-                {
-                    challenge.Submissions = submissionsResponse.YourSubmissions
-                        .Select(s => new SubmissionItem
-                        {
-                            IsSuccess = s.IsSuccessful,
-                            ProposedSolution = s.ProposedSolution,
-                            SubmissionTimestamp = s.SubmissionTimestamp,
-                            Feedback = s.Feedback.Select(f => new FeedbackItem
-                            {
-                                IsValid = f.Valid,
-                                Message = f.Message,
-                                Details = f.Details
-                            }).ToList()
-                        })
-                        .ToList();
-                }
-
+                await LoadChallenge(challenge);
                 StateHasChanged();
             }
         }
+    }
+
+    private async Task LoadChallenge(ChallengeItem challenge)
+    {
+        var challengeResponse = await Mediator.Send(new GetChallengeByNameQuery { ChallengeName = challenge.Name });
+        if (challengeResponse != null)
+        {
+            challenge.Title = challengeResponse.Title;
+        }
+
+        var scoreResponse = await Mediator.Send(new GetYourScoreQuery { ChallengeName = challenge.Name, TeamName = TeamName });
+        if (scoreResponse != null)
+        {
+            challenge.TeamName = TeamName;
+            challenge.IsSuccess = scoreResponse.TotalAttempts == 0 ? null : scoreResponse.IsSuccess;
+            challenge.TotalAttempts = scoreResponse.TotalAttempts;
+            challenge.Score = scoreResponse.Score;
+        }
+
+        var submissionsResponse = await Mediator.Send(new GetYourSubmissionsQuery { ChallengeName = challenge.Name, TeamName = TeamName });
+        if (submissionsResponse != null)
+        {
+            challenge.Submissions = submissionsResponse.YourSubmissions
+                .Select(s => new SubmissionItem
+                {
+                    IsSuccess = s.IsSuccessful,
+                    ProposedSolution = s.ProposedSolution,
+                    SubmissionTimestamp = s.SubmissionTimestamp,
+                    Feedback = s.Feedback.Select(f => new FeedbackItem
+                    {
+                        IsValid = f.Valid,
+                        Message = f.Message,
+                        Details = f.Details
+                    }).ToList()
+                })
+                .ToList();
+        }
+    }
+
+    private async Task ResetChallenge(ChallengeItem challenge)
+    {
+        if (AuthToken == null || !Guid.TryParse(TeamId, out var teamId))
+        {
+            return;
+        }
+
+        var response = await Mediator.Send(new ResetChallengeCommand
+        {
+            RequestingTeamId = AuthToken.TeamId,
+            TeamId = teamId,
+            ChallengeName = challenge.Name
+        });
+
+        IsErrorMessage = !response.Success;
+        Message = response.Success
+            ? $"All submissions for challenge {challenge.Name} have been removed."
+            : response.ErrorMessage;
+
+        if (response.Success)
+        {
+            await LoadChallenge(challenge);
+        }
+
+        StateHasChanged();
     }
 
     class ChallengeGroup
