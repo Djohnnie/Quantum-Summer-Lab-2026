@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using QuantumSummerLab.Application.Extensions;
+using QuantumSummerLab.Application.Helpers;
 using QuantumSummerLab.Data;
 using QuantumSummerLab.Data.Model;
 using System.Net.Http.Json;
@@ -58,15 +59,18 @@ public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChall
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IConfiguration _configuration;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IErrorSummarizer _errorSummarizer;
 
     public VerifyChallengeSolutionCommandHandler(
         IServiceScopeFactory scopeFactory,
         IConfiguration configuration,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        IErrorSummarizer errorSummarizer)
     {
         _scopeFactory = scopeFactory;
         _configuration = configuration;
         _httpClientFactory = httpClientFactory;
+        _errorSummarizer = errorSummarizer;
     }
 
     public async Task<VerifyChallengeSolutionResponse> Handle(VerifyChallengeSolutionCommand request, CancellationToken cancellationToken)
@@ -138,16 +142,31 @@ public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChall
         });
         await dbContext.SaveChangesAsync(cancellationToken);
 
+        var verificationFeedback = new List<VerificationFeedback>();
+        foreach (var message in feedback.Messages)
+        {
+            var details = message.Details;
+
+            // Details on a failed message holds the raw Q# compiler/runtime error; rewrite it
+            // in plain language so participants aren't shown a wall of technical output.
+            if (!message.Valid && !string.IsNullOrWhiteSpace(details))
+            {
+                details = await _errorSummarizer.SummarizeError(details, request.Solution);
+            }
+
+            verificationFeedback.Add(new VerificationFeedback
+            {
+                Valid = message.Valid,
+                Message = message.Message,
+                Details = details
+            });
+        }
+
         return new VerifyChallengeSolutionResponse
         {
             IsValid = feedback.IsValid,
             FeedbackMessage = $"Your submitted solution {(feedback.IsValid ? "is" : "is not")} correct.",
-            Feedback = feedback.Messages.Select(m => new VerificationFeedback
-            {
-                Valid = m.Valid,
-                Message = m.Message,
-                Details = m.Details
-            }).ToList()
+            Feedback = verificationFeedback
         };
     }
 

@@ -9,6 +9,7 @@ using OpenAI;
 using OpenAI.Chat;
 using QuantumSummerLab.Application.Chats.Commands;
 using QuantumSummerLab.Application.Chats.Queries;
+using QuantumSummerLab.Application.Helpers;
 using QuantumSummerLab.Copilot.Extensions;
 using System.ClientModel;
 using System.Diagnostics;
@@ -19,9 +20,10 @@ namespace QuantumSummerLab.Copilot;
 public interface ICopilotHelper
 {
     Task<ChatHistory> Chat(ChatHistory chatHistory);
+    Task<string> SummarizeError(string error, string submission);
 }
 
-public class CopilotHelper : ICopilotHelper
+public class CopilotHelper : ICopilotHelper, IErrorSummarizer
 {
     private readonly IMediator _mediator;
     private readonly IServiceProvider _serviceProvider;
@@ -144,6 +146,42 @@ public class CopilotHelper : ICopilotHelper
         }
 
         return refreshedHistory;
+    }
+
+    public async Task<string> SummarizeError(string error, string submission)
+    {
+        if (string.IsNullOrWhiteSpace(error))
+        {
+            return error;
+        }
+
+        try
+        {
+            var agentName = "ErrorSummarizerAgent";
+            var agentDescription = "Agent that explains Q# compiler and runtime errors in plain language";
+            var instructions = "You explain Microsoft Q# compiler and runtime errors to students taking part in the Quantum Summer Lab. " +
+                "You are given the error message and the Q# code the student submitted, for context on what likely caused it. " +
+                "Rewrite the error message as 1 to 3 short sentences of clear, non-technical language a beginner can understand. " +
+                "Explain what kind of mistake likely caused it, but never reveal the exact code fix or solution. " +
+                "Do not use markdown, asterisks or code blocks, and respond with only the explanation and the line number if available, nothing else.";
+            var agent = InitializeAgent(agentName, agentDescription, instructions);
+
+            var prompt = $"Error:\n{error}\n\nSubmitted Q# code:\n{submission}";
+
+            var agentThread = new List<Microsoft.Extensions.AI.ChatMessage>
+            {
+                new(Microsoft.Extensions.AI.ChatRole.User, prompt)
+            };
+
+            var agentResponse = await agent.RunAsync(agentThread);
+
+            return agentResponse.ToString().Replace("**", "").Trim();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while summarizing an error message.");
+            return error;
+        }
     }
 
     private async Task<(string, int)> Reduce(ChatHistory chatHistory)
