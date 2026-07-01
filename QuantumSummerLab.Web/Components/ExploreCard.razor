@@ -8,22 +8,3 @@
         <MudText Typo="Typo.subtitle2" Class="mt-3">@Title</MudText>
     </MudPaper>
 </a>
-
-@code
-{
-    [Parameter] public string Title { get; set; }
-    [Parameter] public string Link { get; set; }
-    [Parameter] public RenderFragment ChildContent { get; set; }
-
-    private string GetLink()
-    {
-        if (String.IsNullOrEmpty(Link))
-        {
-            return $"/components/{Title.Replace(" ", "").ToLowerInvariant()}";
-        }
-        else
-        {
-            return Link;
-        }
-    }
-}
