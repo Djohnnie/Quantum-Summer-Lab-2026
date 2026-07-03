@@ -30,6 +30,7 @@ public partial class Challenge
     private string[] Description { get; set; }
     private string Tldr { get; set; }
     private string SolutionTemplate { get; set; }
+    private string ChallengeSolutionTemplate { get; set; }
     private string[] ExampleDescription { get; set; }
     private string ExampleCode { get; set; }
     private string CopilotInstructions { get; set; }
@@ -56,6 +57,7 @@ public partial class Challenge
         {
             _loadedChallengeName = ChallengeName;
             IsLoading = true;
+            YourSubmissions = new List<YourSubmission>();
 
             var challenge = await Mediator.Send(new GetChallengeByNameQuery { ChallengeName = ChallengeName });
             IsAvailable = challenge.IsAvailable;
@@ -64,14 +66,16 @@ public partial class Challenge
                 Title = challenge.Title;
                 Description = challenge.Description.Split("[BR]");
                 Tldr = challenge.Tldr;
-                SolutionTemplate = $"```js{Environment.NewLine}{challenge.SolutionTemplate}{Environment.NewLine}```";
+                ChallengeSolutionTemplate = challenge.SolutionTemplate;
+                SolutionTemplate = $"```js{Environment.NewLine}{ChallengeSolutionTemplate}{Environment.NewLine}```";
+                Solution = ChallengeSolutionTemplate;
                 ExampleDescription = challenge.ExampleDescription.Split("[BR]", StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
                 ExampleCode = $"```js{Environment.NewLine}{challenge.ExampleCode}{Environment.NewLine}```";
                 FeedbackMessage = "You have not yet submitted a solution";
                 VerificationFeedback = new List<VerificationFeedback>();
                 CopilotInstructions = challenge.CopilotInstructions;
-                await Clear();
                 await LoadScore();
+                await InitializeEditorSolution();
                 await LoadStatistics();
             }
 
@@ -95,6 +99,7 @@ public partial class Challenge
             _lastLoggedIn = authToken.Success;
 
             await LoadScore();
+            await InitializeEditorSolution();
             await LoadStatistics();
             StateHasChanged();
         }
@@ -170,15 +175,42 @@ public partial class Challenge
 
     private async Task LoadScore()
     {
-        if (!string.IsNullOrEmpty(TeamName))
+        if (string.IsNullOrEmpty(TeamName))
         {
-            var score = await Mediator.Send(new GetYourScoreQuery { ChallengeName = ChallengeName, TeamName = TeamName });
-            IsSuccess = score.IsSuccess;
-            NumberOfAttempts = score.TotalAttempts;
-
-            var submissions = await Mediator.Send(new GetYourSubmissionsQuery { ChallengeName = ChallengeName, TeamName = TeamName });
-            YourSubmissions = submissions.YourSubmissions;
+            YourSubmissions = new List<YourSubmission>();
+            IsSuccess = false;
+            NumberOfAttempts = 0;
+            return;
         }
+
+        var score = await Mediator.Send(new GetYourScoreQuery { ChallengeName = ChallengeName, TeamName = TeamName });
+        IsSuccess = score.IsSuccess;
+        NumberOfAttempts = score.TotalAttempts;
+
+        var submissions = await Mediator.Send(new GetYourSubmissionsQuery { ChallengeName = ChallengeName, TeamName = TeamName });
+        YourSubmissions = submissions.YourSubmissions;
+    }
+
+    private async Task InitializeEditorSolution()
+    {
+        var initialSolution = ChallengeSolutionTemplate ?? string.Empty;
+
+        if (YourSubmissions != null && YourSubmissions.Any())
+        {
+            var lastSubmission = YourSubmissions.FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(lastSubmission?.Code))
+            {
+                initialSolution = lastSubmission.Code;
+            }
+        }
+
+        Solution = initialSolution;
+        if (_editorReady)
+        {
+            await _editor.SetValue(Solution);
+        }
+
+        StateHasChanged();
     }
 
     private async Task LoadStatistics()
