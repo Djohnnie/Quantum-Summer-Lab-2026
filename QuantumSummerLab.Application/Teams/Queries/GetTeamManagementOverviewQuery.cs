@@ -55,7 +55,8 @@ public class GetTeamManagementOverviewQueryHandler : IRequestHandler<GetTeamMana
         }
 
         var teams = await dbContext.Teams
-            .OrderBy(x => x.Name)
+            .OrderBy(x => x.IsArchived)
+            .ThenBy(x => x.Name)
             .Select(x => new ManagedTeamDto
             {
                 TeamId = x.Id,
