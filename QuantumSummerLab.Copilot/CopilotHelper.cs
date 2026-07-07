@@ -10,6 +10,7 @@ using OpenAI.Chat;
 using QuantumSummerLab.Application.Chats.Commands;
 using QuantumSummerLab.Application.Chats.Queries;
 using QuantumSummerLab.Application.Helpers;
+using QuantumSummerLab.Application.Scores.Commands;
 using QuantumSummerLab.Copilot.Extensions;
 using System.ClientModel;
 using System.Diagnostics;
@@ -23,7 +24,7 @@ public interface ICopilotHelper
     Task<string> SummarizeError(string error, string submission);
 }
 
-public class CopilotHelper : ICopilotHelper, IErrorSummarizer
+public class CopilotHelper : ICopilotHelper, IErrorSummarizer, IFeedbackTipper
 {
     private readonly IMediator _mediator;
     private readonly IServiceProvider _serviceProvider;
@@ -160,10 +161,12 @@ public class CopilotHelper : ICopilotHelper, IErrorSummarizer
             var agentName = "ErrorSummarizerAgent";
             var agentDescription = "Agent that explains Q# compiler and runtime errors in plain language";
             var instructions = "You explain Microsoft Q# compiler and runtime errors to students taking part in the Quantum Summer Lab. " +
-                "You are given the error message and the Q# code the student submitted, for context on what likely caused it. " +
-                "Rewrite the error message as 1 to 3 short sentences of clear, non-technical language a beginner can understand. " +
-                "Explain what kind of mistake likely caused it, but never reveal the exact code fix or solution. " +
-                "Do not use markdown, asterisks or code blocks, and respond with only the explanation and the line number if available, nothing else.";
+                "You are given the raw error output and the Q# code the student submitted, for context on what likely caused it. " +
+                "The raw error output is often compiler debug text with variant names and byte-offset spans like NotFound(\"q\", Span { lo: 2299, hi: 2300 }); the offsets point into a larger program the student's code was inserted into, so never mention spans, byte offsets or these raw variant names. " +
+                "Rewrite the error as 1 to 3 short sentences of clear, non-technical language a beginner can understand. " +
+                "Explain what kind of mistake likely caused it and, if you can locate the mistake in the submitted code, say where. " +
+                "Never reveal the exact code fix or solution. " +
+                "Do not use markdown, asterisks or code blocks, and respond with only the explanation, nothing else.";
             var agent = InitializeAgent(agentName, agentDescription, instructions);
 
             var prompt = $"Error:\n{error}\n\nSubmitted Q# code:\n{submission}";
@@ -181,6 +184,57 @@ public class CopilotHelper : ICopilotHelper, IErrorSummarizer
         {
             _logger.LogError(ex, "An error occurred while summarizing an error message.");
             return error;
+        }
+    }
+
+    public async Task<string> GetTip(string challengeDescription, string correctSolution, List<VerificationFeedback> feedback, string submission)
+    {
+        if (feedback == null || !feedback.Any(x => !x.Valid))
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            var agentName = "FeedbackTipperAgent";
+            var agentDescription = "Agent that gives small incremental tips based on verification feedback";
+            var instructions = "You help students taking part in the Quantum Summer Lab improve their Microsoft Q# challenge solutions. " +
+                "You are given the challenge description, the correct reference solution, the verification feedback for a failed submission, and the Q# code the student submitted. " +
+                "Use the reference solution and the challenge description only to understand what a correct solution should do. " +
+                "Give exactly one small, incremental tip of 1 to 3 short sentences that nudges the student a single step closer to a correct solution. " +
+                "Base the tip on the failed feedback messages and how the submission differs from the reference solution. " +
+                "Never reveal, quote or paraphrase the reference solution, and never reveal the exact code fix or the expected output. " +
+                "Always encourage the student to keep trying. " +
+                "Do not use markdown, asterisks or code blocks, and respond with only the tip, nothing else.";
+            var agent = InitializeAgent(agentName, agentDescription, instructions);
+
+            var feedbackBuilder = new StringBuilder();
+            foreach (var message in feedback)
+            {
+                feedbackBuilder.AppendLine($"- [{(message.Valid ? "passed" : "failed")}] {message.Message}");
+                if (!string.IsNullOrWhiteSpace(message.Details))
+                {
+                    feedbackBuilder.AppendLine($"  Details: {message.Details}");
+                }
+            }
+
+            var prompt = $"Challenge description:\n{challengeDescription}\n\n" +
+                $"Correct reference solution (never reveal it):\n{correctSolution}\n\n" +
+                $"Verification feedback:\n{feedbackBuilder}\nSubmitted Q# code:\n{submission}";
+
+            var agentThread = new List<Microsoft.Extensions.AI.ChatMessage>
+            {
+                new(Microsoft.Extensions.AI.ChatRole.User, prompt)
+            };
+
+            var agentResponse = await agent.RunAsync(agentThread);
+
+            return agentResponse.ToString().Replace("**", "").Trim();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while generating a feedback tip.");
+            return string.Empty;
         }
     }
 

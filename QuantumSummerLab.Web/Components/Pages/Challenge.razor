@@ -104,6 +104,10 @@ else if (IsAvailable)
                                     <pre class="qsharp-error-details ml-12 mr-4">@feedback.Details</pre>
                                 }
                             }
+                            @if (!string.IsNullOrWhiteSpace(Tips))
+                            {
+                                <MudAlert Severity="Severity.Info" Class="ml-4 mt-4"><strong>Tip:</strong> @Tips</MudAlert>
+                            }
                         </MudContainer>
                     }
                     <MudText Typo="Typo.subtitle2" Class="mb-2">Your solution</MudText>
@@ -188,6 +192,10 @@ else if (IsAvailable)
                                                 {
                                                     <pre class="qsharp-error-details ml-16 mr-4">@feedback.Details</pre>
                                                 }
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(submission.Tip))
+                                            {
+                                                <MudAlert Severity="Severity.Info" Class="ml-8 mt-4"><strong>Tip:</strong> @submission.Tip</MudAlert>
                                             }
                                     </div>
                                     <ThemedMarkdown Value="@submission.ProposedSolution" />

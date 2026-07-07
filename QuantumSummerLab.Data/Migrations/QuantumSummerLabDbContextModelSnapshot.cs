@@ -59,6 +59,10 @@ namespace QuantumSummerLab.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Solution")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SolutionTemplate")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -177,6 +181,9 @@ namespace QuantumSummerLab.Data.Migrations
 
                     b.Property<Guid>("TeamId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Tip")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

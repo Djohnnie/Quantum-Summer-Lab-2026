@@ -25,6 +25,7 @@ public class YourSubmission
     public DateTime SubmissionTimestamp { get; set; }
     public string ProposedSolution { get; set; }
     public string Code { get; set; }
+    public string Tip { get; set; }
     public List<SubmissionFeedback> Feedback { get; set; }
 }
 
@@ -56,7 +57,8 @@ public class GetYourSubmissionsQueryHandler : IRequestHandler<GetYourSubmissions
                 x.IsSuccessful,
                 x.ProposedSolution,
                 x.SubmissionTimestamp,
-                x.Feedback
+                x.Feedback,
+                x.Tip
             })
             .ToListAsync(cancellationToken);
 
@@ -72,6 +74,7 @@ public class GetYourSubmissionsQueryHandler : IRequestHandler<GetYourSubmissions
                 IsSuccessful = score.IsSuccessful,
                 ProposedSolution = $"```js{Environment.NewLine}{code}{Environment.NewLine}```",
                 Code = code,
+                Tip = score.Tip,
                 SubmissionTimestamp = score.SubmissionTimestamp,
                 Feedback = feedback.Messages.Select(x => new SubmissionFeedback
                 {

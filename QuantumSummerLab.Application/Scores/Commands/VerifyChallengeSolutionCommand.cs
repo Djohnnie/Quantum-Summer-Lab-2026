@@ -24,6 +24,7 @@ public class VerifyChallengeSolutionResponse
     public bool IsValid { get; set; }
     public string FeedbackMessage { get; set; }
     public List<VerificationFeedback> Feedback { get; set; }
+    public string Tips { get; set; }
 }
 
 public class VerificationFeedback
@@ -60,17 +61,20 @@ public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChall
     private readonly IConfiguration _configuration;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IErrorSummarizer _errorSummarizer;
+    private readonly IFeedbackTipper _feedbackTipper;
 
     public VerifyChallengeSolutionCommandHandler(
         IServiceScopeFactory scopeFactory,
         IConfiguration configuration,
         IHttpClientFactory httpClientFactory,
-        IErrorSummarizer errorSummarizer)
+        IErrorSummarizer errorSummarizer,
+        IFeedbackTipper feedbackTipper)
     {
         _scopeFactory = scopeFactory;
         _configuration = configuration;
         _httpClientFactory = httpClientFactory;
         _errorSummarizer = errorSummarizer;
+        _feedbackTipper = feedbackTipper;
     }
 
     public async Task<VerifyChallengeSolutionResponse> Handle(VerifyChallengeSolutionCommand request, CancellationToken cancellationToken)
@@ -131,42 +135,80 @@ public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChall
             return Failure("The verification service returned an invalid response. Please try again.");
         }
 
+        var rawFeedback = feedback.Messages.Select(message => new VerificationFeedback
+        {
+            Valid = message.Valid,
+            Message = message.Message,
+            Details = message.Details
+        }).ToList();
+
+        // Only ask for a tip on a failed submission; the tip nudges the participant
+        // forward based on the feedback without ever revealing the solution. The
+        // challenge description and reference solution are passed along as context so
+        // the tip is grounded in what a correct solution should do. Challenges seeded
+        // before the Solution column existed fall back to the verification template,
+        // which also embeds the expected behavior. The tip works off the raw feedback,
+        // so it can run concurrently with the error summarizations below.
+        var correctSolution = string.IsNullOrWhiteSpace(challenge.Solution)
+            ? verificationTemplate
+            : challenge.Solution.FromBase64String();
+
+        var tipTask = feedback.IsValid
+            ? Task.FromResult<string>(null)
+            : _feedbackTipper.GetTip(
+                challenge.Description.Replace("[BR]", "\n"),
+                correctSolution,
+                rawFeedback,
+                request.Solution);
+
+        // Details on a failed message holds the raw Q# compiler/runtime error; rewrite it
+        // in plain language so participants aren't shown a wall of technical output.
+        var summaryTasks = feedback.Messages.Select(async message => new VerificationFeedback
+        {
+            Valid = message.Valid,
+            Message = message.Message,
+            Details = !message.Valid && !string.IsNullOrWhiteSpace(message.Details)
+                ? await _errorSummarizer.SummarizeError(message.Details, request.Solution)
+                : message.Details
+        });
+
+        var verificationFeedback = (await Task.WhenAll(summaryTasks)).ToList();
+        var tips = await tipTask;
+
+        // The score is saved only after the LLM calls complete so the tip and the
+        // summarized (readable) error details can be stored with the submission and
+        // shown again in the submission history. GetTip and SummarizeError swallow
+        // their own failures, so this save is not at risk of being skipped because
+        // of an LLM error.
+        var storedFeedback = new QSharpFeedback
+        {
+            IsValid = feedback.IsValid,
+            Messages = verificationFeedback.Select(x => new QSharpFeedbackMessage
+            {
+                Valid = x.Valid,
+                Message = x.Message,
+                Details = x.Details
+            }).ToList()
+        };
+
         dbContext.Scores.Add(new Score
         {
             Challenge = challenge,
             Team = team,
             IsSuccessful = feedback.IsValid,
-            Feedback = JsonSerializer.Serialize(feedback),
+            Feedback = JsonSerializer.Serialize(storedFeedback),
+            Tip = string.IsNullOrWhiteSpace(tips) ? null : tips,
             ProposedSolution = request.Solution.ToBase64String(),
             SubmissionTimestamp = request.Timestamp
         });
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        var verificationFeedback = new List<VerificationFeedback>();
-        foreach (var message in feedback.Messages)
-        {
-            var details = message.Details;
-
-            // Details on a failed message holds the raw Q# compiler/runtime error; rewrite it
-            // in plain language so participants aren't shown a wall of technical output.
-            if (!message.Valid && !string.IsNullOrWhiteSpace(details))
-            {
-                details = await _errorSummarizer.SummarizeError(details, request.Solution);
-            }
-
-            verificationFeedback.Add(new VerificationFeedback
-            {
-                Valid = message.Valid,
-                Message = message.Message,
-                Details = details
-            });
-        }
-
         return new VerifyChallengeSolutionResponse
         {
             IsValid = feedback.IsValid,
             FeedbackMessage = $"Your submitted solution {(feedback.IsValid ? "is" : "is not")} correct.",
-            Feedback = verificationFeedback
+            Feedback = verificationFeedback,
+            Tips = tips
         };
     }
 

@@ -35,6 +35,7 @@ public partial class Challenge
     private string ExampleCode { get; set; }
     private string CopilotInstructions { get; set; }
     private string FeedbackMessage { get; set; }
+    private string Tips { get; set; }
     private bool? IsValid { get; set; }
 
     private string Solution { get; set; }
@@ -73,6 +74,7 @@ public partial class Challenge
                 ExampleCode = $"```js{Environment.NewLine}{challenge.ExampleCode}{Environment.NewLine}```";
                 FeedbackMessage = "You have not yet submitted a solution";
                 VerificationFeedback = new List<VerificationFeedback>();
+                Tips = null;
                 CopilotInstructions = challenge.CopilotInstructions;
                 await LoadScore();
                 await InitializeEditorSolution();
@@ -126,6 +128,7 @@ public partial class Challenge
         IsValid = response.IsValid;
         FeedbackMessage = response.FeedbackMessage;
         VerificationFeedback = response.Feedback;
+        Tips = response.Tips;
 
         await LoadScore();
         await LoadStatistics();
@@ -142,6 +145,7 @@ public partial class Challenge
         IsValid = null;
         FeedbackMessage = "You have not yet submitted a solution";
         VerificationFeedback = new List<VerificationFeedback>();
+        Tips = null;
         if (_editorReady)
         {
             await _editor.SetValue(string.Empty);

@@ -242,6 +242,7 @@ static async Task<ChallengeAction> ProcessChallengeAsync(QuantumSummerLabDbConte
                    .SetProperty(p => p.Description, challenge.Description)
                    .SetProperty(p => p.Tldr, challenge.Tldr)
                    .SetProperty(p => p.SolutionTemplate, challenge.SolutionTemplate)
+                   .SetProperty(p => p.Solution, challenge.Solution)
                    .SetProperty(p => p.ExampleDescription, challenge.ExampleDescription)
                    .SetProperty(p => p.ExampleCode, challenge.ExampleCode)
                    .SetProperty(p => p.VerificationTemplate, challenge.VerificationTemplate)

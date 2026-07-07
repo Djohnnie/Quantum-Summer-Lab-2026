@@ -9,5 +9,6 @@ public class Score
     public string ProposedSolution { get; set; }
     public bool IsSuccessful { get; set; }
     public string Feedback { get; set; }
+    public string? Tip { get; set; }
     public DateTime SubmissionTimestamp { get; set; }
 }

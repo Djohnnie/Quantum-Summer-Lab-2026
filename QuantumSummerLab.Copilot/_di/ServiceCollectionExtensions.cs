@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<ICopilotHelper, CopilotHelper>();
         services.AddScoped<IErrorSummarizer, CopilotHelper>();
+        services.AddScoped<IFeedbackTipper, CopilotHelper>();
 
         return services;
     }

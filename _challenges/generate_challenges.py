@@ -13,6 +13,7 @@ Each Main.qs is the single source of truth for one challenge:
 From that, this script derives the fields that used to be hand-copied as
 opaque Base64 and went stale:
   - SolutionTemplate: the Solve operation's signature with a stub body.
+  - Solution: the full reference Solve implementation (the SOLVE block).
   - VerificationTemplate: the whole file with the Solve implementation cut
     out and replaced by the `<<SOLVE>>` placeholder.
   - ExpectedStates: the JSON block, re-encoded to Base64.
@@ -157,7 +158,7 @@ def b64(text):
     return base64.b64encode(text.encode("utf-8")).decode("ascii")
 
 
-def render_challenge_block(fields, solution_b64, verification_b64):
+def render_challenge_block(fields, solution_template_b64, solution_b64, verification_b64):
     name = fields["Name"]
     lines = [
         f'    public static Challenge CHALLENGE_{name} = new Challenge',
@@ -166,7 +167,8 @@ def render_challenge_block(fields, solution_b64, verification_b64):
         f'        Title = "{fields["Title"]}",',
         f'        Description = "{fields["Description"]}",',
         f'        Tldr = "{fields["Tldr"]}",',
-        f'        SolutionTemplate = "{solution_b64}",',
+        f'        SolutionTemplate = "{solution_template_b64}",',
+        f'        Solution = "{solution_b64}",',
         f'        ExampleDescription = "{fields["ExampleDescription"]}",',
         f'        ExampleCode = "{fields["ExampleCode"]}",',
         f'        VerificationTemplate = "{verification_b64}",',
@@ -215,13 +217,13 @@ def main():
         try:
             fields, code_section = parse_metadata(text, path)
             before, solve_body, after = extract_solve(code_section, path)
-            solution_src = build_solution_template(solve_body, path)
+            solution_template_src = build_solution_template(solve_body, path)
             verification_src = build_verification_template(before, after)
         except ChallengeParseError as e:
             print(f"ERROR: {e}", file=sys.stderr)
             return 1
 
-        block = render_challenge_block(fields, b64(solution_src), b64(verification_src))
+        block = render_challenge_block(fields, b64(solution_template_src), b64(solve_body), b64(verification_src))
         blocks.append((fields["Name"], block))
 
         names_by_group.setdefault(group_prefix(fields["Name"]), []).append(fields["Name"])
