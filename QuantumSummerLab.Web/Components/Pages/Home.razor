@@ -7,6 +7,7 @@
 
 @inject ProtectedLocalStorage ProtectedLocalStore
 @inject IMediator Mediator
+@inject NavigationManager NavigationManager
 
 <PageTitle>Welcome</PageTitle>
 
@@ -21,6 +22,16 @@
 <MudText>This workshop is part of the afternoon session on July 9, 2026 and is delivered by Microsoft and the Cronos Group.</MudText>
 <MudText>This hands-on lab introduces quantum states, gates, circuits, and quantum programming with Q# through practical exercises and guided challenges.</MudText>
 <MudText Class="mb-4">Use this platform to progress from the example challenge to more advanced quantum puzzles at your own pace.</MudText>
+@if (!IsLoggedIn)
+{
+    <MudCard Outlined="true" Class="my-8">
+        <MudCardContent Class="d-flex align-center justify-space-between flex-wrap gap-4">
+            <MudText>You need to <strong>create an account</strong> or <strong>login</strong> with an existing account to start participating in the challenges.</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login" OnClick="@(() => NavigationManager.NavigateTo("/login"))">Login</MudButton>
+        </MudCardContent>
+    </MudCard>
+}
+
 <MudText>This workshop is supported by</MudText>
 
 <div class="d-flex justify-center align-center flex-wrap gap-12 mt-8">

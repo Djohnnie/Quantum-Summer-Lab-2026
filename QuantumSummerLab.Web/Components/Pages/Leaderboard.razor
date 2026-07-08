@@ -12,7 +12,7 @@
 
 <PageTitle>Quantum Summer Lab - Leaderboard</PageTitle>
 
-@if (Entries is not null)
+@if (Entries is not null && Entries.Any())
 {
     <MudCard Outlined="true" Class="mt-6">
         <MudCardHeader>
@@ -54,6 +54,16 @@
                 </MudTd>
             </RowTemplate>
         </MudTable>
+    </MudCard>
+}
+else if (Entries is not null)
+{
+    <MudCard Outlined="true" Class="mt-6">
+        <MudCardContent>
+            <MudAlert Severity="Severity.Info">
+                No teams are available yet. <MudLink Href="/login">Register a team</MudLink> to get started!
+            </MudAlert>
+        </MudCardContent>
     </MudCard>
 }
 else
