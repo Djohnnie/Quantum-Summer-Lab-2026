@@ -2,20 +2,42 @@ using QuantumSummerLab.Application.Scores.Queries;
 
 namespace QuantumSummerLab.Web.Components.Pages;
 
-public partial class Leaderboard
+public partial class Leaderboard : IDisposable
 {
     private List<LeaderboardEntry> Entries { get; set; }
     private string SearchString = string.Empty;
+    private PeriodicTimer RefreshTimer;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            var result = await Mediator.Send(new GetLeaderboardQuery());
-            Entries = result.Entries;
+            await LoadEntriesAsync();
 
-            StateHasChanged();
+            RefreshTimer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+            _ = RefreshLoopAsync();
         }
+    }
+
+    private async Task RefreshLoopAsync()
+    {
+        while (await RefreshTimer.WaitForNextTickAsync())
+        {
+            await LoadEntriesAsync();
+        }
+    }
+
+    private async Task LoadEntriesAsync()
+    {
+        var result = await Mediator.Send(new GetLeaderboardQuery());
+        Entries = result.Entries;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        RefreshTimer?.Dispose();
     }
 
     private static string GetMedalStyle(int position) => position switch
