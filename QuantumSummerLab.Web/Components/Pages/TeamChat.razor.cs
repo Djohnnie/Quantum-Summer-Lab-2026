@@ -3,7 +3,6 @@ using QuantumSummerLab.Application.Chats.Queries;
 using QuantumSummerLab.Application.Teams.Commands;
 using QuantumSummerLab.Application.Teams.Queries;
 using QuantumSummerLab.Copilot;
-using QuantumSummerLab.Copilot.Extensions;
 
 namespace QuantumSummerLab.Web.Components.Pages;
 
@@ -91,10 +90,10 @@ public partial class TeamChat
             switch (chat.Role)
             {
                 case "User":
-                    _chatHistory.AddUserMessage(chat.Message, chat.TokensUsed, chat.Timestamp.AsTimeAgo(), chat.Id, chat.IsReduced, chat.IsDeleted);
+                    _chatHistory.AddUserMessage(chat.Message, chat.TokensUsed, chat.Timestamp, chat.Id, chat.IsReduced, chat.IsDeleted);
                     break;
                 case "Assistant":
-                    _chatHistory.AddAssistantMessage(chat.Message, chat.TokensUsed, chat.Timestamp.AsTimeAgo(), chat.Id, chat.IsReduced, chat.IsDeleted);
+                    _chatHistory.AddAssistantMessage(chat.Message, chat.TokensUsed, chat.Timestamp, chat.Id, chat.IsReduced, chat.IsDeleted);
                     break;
                 case "Reduced":
                     _chatHistory.AddReducedMessage(chat.Message, chat.TokensUsed, chat.Id, chat.IsReduced);

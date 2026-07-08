@@ -8,10 +8,12 @@ using QuantumSummerLab.Copilot.Extensions;
 
 namespace QuantumSummerLab.Web.Components.Pages;
 
-public partial class TeamReport
+public partial class TeamReport : IDisposable
 {
     [Parameter]
     public string TeamId { get; set; } = string.Empty;
+
+    private PeriodicTimer RefreshTimer = null!;
 
     private bool IsLoading { get; set; } = true;
     private bool IsLoggedIn { get; set; }
@@ -76,6 +78,9 @@ public partial class TeamReport
             return;
         }
 
+        RefreshTimer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+        _ = RefreshTimestampsLoopAsync();
+
         var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
         IsLoggedIn = authToken.Success;
         IsAdmin = authToken.Success && authToken.Value!.IsAdmin;
@@ -124,6 +129,20 @@ public partial class TeamReport
         StateHasChanged();
 
         await LoadChallenges();
+    }
+
+    // Re-render on a timer so the "x time ago" submission messages stay up-to-date.
+    private async Task RefreshTimestampsLoopAsync()
+    {
+        while (await RefreshTimer.WaitForNextTickAsync())
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose()
+    {
+        RefreshTimer?.Dispose();
     }
 
     private async Task LoadChallenges()

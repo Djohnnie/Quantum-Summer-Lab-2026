@@ -11,9 +11,10 @@ using QuantumSummerLab.Web.Helpers;
 
 namespace QuantumSummerLab.Web.Components.Pages;
 
-public partial class Challenge
+public partial class Challenge : IDisposable
 {
     private bool? _lastLoggedIn;
+    private PeriodicTimer RefreshTimer = null!;
 
     [Parameter]
     public string ChallengeName { get; set; } = string.Empty;
@@ -93,6 +94,12 @@ public partial class Challenge
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            RefreshTimer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+            _ = RefreshTimestampsLoopAsync();
+        }
+
         await ApplyEditorThemeAsync();
 
         var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
@@ -109,6 +116,20 @@ public partial class Challenge
             await LoadStatistics();
             StateHasChanged();
         }
+    }
+
+    // Re-render on a timer so the "x time ago" submission messages stay up-to-date.
+    private async Task RefreshTimestampsLoopAsync()
+    {
+        while (await RefreshTimer.WaitForNextTickAsync())
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose()
+    {
+        RefreshTimer?.Dispose();
     }
 
     protected async Task Submit()

@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using QuantumSummerLab.Application.Chats.Queries;
 using QuantumSummerLab.Copilot;
-using QuantumSummerLab.Copilot.Extensions;
 
 namespace QuantumSummerLab.Web.Components;
 
-public partial class CopilotPane
+public partial class CopilotPane : IDisposable
 {
     [Parameter]
     public string TeamName { get; set; } = string.Empty;
@@ -20,6 +19,7 @@ public partial class CopilotPane
     private bool _alert1;
     private bool _alert2;
     private string Chat { get; set; } = string.Empty;
+    private PeriodicTimer RefreshTimer = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -32,7 +32,24 @@ public partial class CopilotPane
             _alert2 = alert2.Success ? alert2.Value : true;
 
             StateHasChanged();
+
+            RefreshTimer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+            _ = RefreshTimestampsLoopAsync();
         }
+    }
+
+    // Re-render on a timer so the "x time ago" message headers stay up-to-date.
+    private async Task RefreshTimestampsLoopAsync()
+    {
+        while (await RefreshTimer.WaitForNextTickAsync())
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose()
+    {
+        RefreshTimer?.Dispose();
     }
 
     public async Task Refresh(string challengeName, string instructions)
@@ -100,10 +117,10 @@ public partial class CopilotPane
             switch (chat.Role)
             {
                 case "User":
-                    _chatHistory.AddUserMessage(chat.Message, chat.TokensUsed, chat.Timestamp.AsTimeAgo(), chat.Id, chat.IsReduced);
+                    _chatHistory.AddUserMessage(chat.Message, chat.TokensUsed, chat.Timestamp, chat.Id, chat.IsReduced);
                     break;
                 case "Assistant":
-                    _chatHistory.AddAssistantMessage(chat.Message, chat.TokensUsed, chat.Timestamp.AsTimeAgo(), chat.Id, chat.IsReduced);
+                    _chatHistory.AddAssistantMessage(chat.Message, chat.TokensUsed, chat.Timestamp, chat.Id, chat.IsReduced);
                     break;
                 case "Reduced":
                     _chatHistory.AddReducedMessage(chat.Message, chat.TokensUsed, chat.Id, chat.IsReduced);

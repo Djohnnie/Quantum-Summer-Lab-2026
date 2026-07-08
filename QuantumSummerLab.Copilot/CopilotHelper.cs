@@ -99,7 +99,7 @@ public class CopilotHelper : ICopilotHelper, IErrorSummarizer, IFeedbackTipper
             }
 
             // Add the latest user message to the chat history
-            chatHistoryCopy.AddUserMessage(chatHistory.LatestUserMessage, 0, "Just now");
+            chatHistoryCopy.AddUserMessage(chatHistory.LatestUserMessage, 0, DateTime.UtcNow);
 
             // Convert the chat history to an agent thread
             var agentThread = GetAgentThreadFromChatHistory(chatHistoryCopy);
@@ -143,7 +143,7 @@ public class CopilotHelper : ICopilotHelper, IErrorSummarizer, IFeedbackTipper
             refreshedHistory.AddAssistantMessage(
                 "Sorry, something went wrong while processing your request. Please try again in a moment.",
                 0,
-                "Just now");
+                DateTime.UtcNow);
         }
 
         return refreshedHistory;
@@ -290,10 +290,10 @@ public class CopilotHelper : ICopilotHelper, IErrorSummarizer, IFeedbackTipper
             switch (chat.Role)
             {
                 case "User":
-                    chatHistory.AddUserMessage(chat.Message, chat.TokensUsed, chat.Timestamp.AsTimeAgo(), chat.Id, chat.IsReduced);
+                    chatHistory.AddUserMessage(chat.Message, chat.TokensUsed, chat.Timestamp, chat.Id, chat.IsReduced);
                     break;
                 case "Assistant":
-                    chatHistory.AddAssistantMessage(chat.Message, chat.TokensUsed, chat.Timestamp.AsTimeAgo(), chat.Id, chat.IsReduced);
+                    chatHistory.AddAssistantMessage(chat.Message, chat.TokensUsed, chat.Timestamp, chat.Id, chat.IsReduced);
                     break;
                 case "Reduced":
                     chatHistory.AddReducedMessage(chat.Message, chat.TokensUsed, chat.Id, chat.IsReduced);
@@ -349,7 +349,7 @@ public class ChatHistory
 
     public ChatHistory()
     {
-        AddAssistantMessage("Hello! I am Qubit Buddy. How can I assist you today?", 0, string.Empty, null, true);
+        AddAssistantMessage("Hello! I am Qubit Buddy. How can I assist you today?", 0, null, null, true);
     }
 
     public ChatHistory Copy()
@@ -373,7 +373,8 @@ public class ChatHistory
                 Content = message.Content,
                 IsReduced = message.IsReduced,
                 IsDeleted = message.IsDeleted,
-                TokensUsed = message.TokensUsed
+                TokensUsed = message.TokensUsed,
+                Timestamp = message.Timestamp
             });
         }
         return copy;
@@ -390,7 +391,7 @@ public class ChatHistory
         });
     }
 
-    public void AddUserMessage(string message, int tokensUsed, string header, Guid? id = null, bool isReduced = false, bool isDeleted = false)
+    public void AddUserMessage(string message, int tokensUsed, DateTime? timestamp, Guid? id = null, bool isReduced = false, bool isDeleted = false)
     {
         Messages.Add(new Chat
         {
@@ -400,11 +401,11 @@ public class ChatHistory
             TokensUsed = tokensUsed,
             IsReduced = isReduced,
             IsDeleted = isDeleted,
-            Header = header
+            Timestamp = timestamp
         });
     }
 
-    public void AddAssistantMessage(string message, int tokensUsed, string header, Guid? id = null, bool isReduced = false, bool isDeleted = false)
+    public void AddAssistantMessage(string message, int tokensUsed, DateTime? timestamp, Guid? id = null, bool isReduced = false, bool isDeleted = false)
     {
         Messages.Add(new Chat
         {
@@ -414,7 +415,7 @@ public class ChatHistory
             TokensUsed = tokensUsed,
             IsReduced = isReduced,
             IsDeleted = isDeleted,
-            Header = header
+            Timestamp = timestamp
         });
     }
 
@@ -444,7 +445,10 @@ public class Chat
     public bool IsReduced { get; set; }
     public bool IsDeleted { get; set; }
     public int TokensUsed { get; set; }
-    public string Header { get; set; } = string.Empty;
+    public DateTime? Timestamp { get; set; }
+
+    // Computed at render time so a re-render refreshes the "x time ago" text.
+    public string Header => Timestamp?.AsTimeAgo() ?? string.Empty;
 }
 
 public enum ChatRole
