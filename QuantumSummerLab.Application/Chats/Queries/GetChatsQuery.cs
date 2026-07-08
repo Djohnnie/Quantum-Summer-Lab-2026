@@ -7,20 +7,20 @@ namespace QuantumSummerLab.Application.Chats.Queries;
 
 public class GetChatsQuery : IRequest<GetChatsResponse>
 {
-    public string TeamName { get; set; }
+    public string TeamName { get; set; } = string.Empty;
     public bool ShouldIncludeDeleted { get; set; }
 }
 
 public class GetChatsResponse
 {
-    public List<ChatMessage> Messages { get; set; }
+    public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
 }
 
 public class ChatMessage
 {
     public Guid Id { get; set; }
-    public string Message { get; set; }
-    public string Role { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string Role { get; set; } = string.Empty;
     public int TokensUsed { get; set; }
     public bool IsReduced { get; set; }
     public bool IsDeleted { get; set; }

@@ -13,33 +13,33 @@ namespace QuantumSummerLab.Application.Scores.Commands;
 
 public class VerifyChallengeSolutionCommand : IRequest<VerifyChallengeSolutionResponse>
 {
-    public string ChallengeName { get; set; }
+    public string ChallengeName { get; set; } = string.Empty;
     public Guid RequestingTeamId { get; set; }
-    public string Solution { get; set; }
+    public string Solution { get; set; } = string.Empty;
     public DateTime Timestamp { get; set; }
 }
 
 public class VerifyChallengeSolutionResponse
 {
     public bool IsValid { get; set; }
-    public string FeedbackMessage { get; set; }
-    public List<VerificationFeedback> Feedback { get; set; }
-    public string Tips { get; set; }
+    public string FeedbackMessage { get; set; } = string.Empty;
+    public List<VerificationFeedback> Feedback { get; set; } = new List<VerificationFeedback>();
+    public string Tips { get; set; } = string.Empty;
 }
 
 public class VerificationFeedback
 {
     public bool Valid { get; set; }
-    public string Message { get; set; }
-    public string Details { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string? Details { get; set; }
 }
 
 public class QSharpRequest
 {
-    public string VerificationTemplate { get; set; }
-    public string Solution { get; set; }
-    public string ExpectedOutput { get; set; }
-    public string ExpectedStates { get; set; }
+    public string VerificationTemplate { get; set; } = string.Empty;
+    public string Solution { get; set; } = string.Empty;
+    public string ExpectedOutput { get; set; } = string.Empty;
+    public string ExpectedStates { get; set; } = string.Empty;
 }
 
 public class QSharpFeedback
@@ -51,8 +51,8 @@ public class QSharpFeedback
 public class QSharpFeedbackMessage
 {
     public bool Valid { get; set; }
-    public string Message { get; set; }
-    public string Details { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string? Details { get; set; }
 }
 
 public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChallengeSolutionCommand, VerifyChallengeSolutionResponse>
@@ -154,7 +154,7 @@ public class VerifyChallengeSolutionCommandHandler : IRequestHandler<VerifyChall
             : challenge.Solution.FromBase64String();
 
         var tipTask = feedback.IsValid
-            ? Task.FromResult<string>(null)
+            ? Task.FromResult(string.Empty)
             : _feedbackTipper.GetTip(
                 challenge.Description.Replace("[BR]", "\n"),
                 correctSolution,

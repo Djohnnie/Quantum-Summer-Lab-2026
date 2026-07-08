@@ -7,7 +7,7 @@ namespace QuantumSummerLab.Application.Scores.Queries;
 
 public class GetChallengeStatisticsQuery : IRequest<GetChallengeStatisticsResponse>
 {
-    public string ChallengeName { get; set; }
+    public string ChallengeName { get; set; } = string.Empty;
     public Guid RequestingTeamId { get; set; }
 }
 

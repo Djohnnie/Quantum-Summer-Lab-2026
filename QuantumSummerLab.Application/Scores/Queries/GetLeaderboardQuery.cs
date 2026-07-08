@@ -18,8 +18,8 @@ public class GetLeaderboardResponse
 public class LeaderboardEntry
 {
     public int Position { get; set; }
-    public string TeamName { get; set; }
-    public string TeamId { get; set; }
+    public string TeamName { get; set; } = string.Empty;
+    public string TeamId { get; set; } = string.Empty;
     public int TotalPoints { get; set; }
     public int ChallengesTried { get; set; }
     public int ChallengesCompleted { get; set; }

@@ -6,10 +6,8 @@ namespace QuantumSummerLab.Web.Components.Pages;
 
 public partial class Login
 {
-    private int currentCount = 0;
-
     private bool IsLoggedIn { get; set; }
-    private string LoggedInTeamName { get; set; }
+    private string LoggedInTeamName { get; set; } = string.Empty;
     private string ErrorMessage { get; set; } = string.Empty;
     private string InfoMessage { get; set; } = string.Empty;
     private string TeamName { get; set; } = string.Empty;
@@ -49,7 +47,7 @@ public partial class Login
 
         if (response.Success)
         {
-            await ProtectedLocalStore.SetAsync("authToken", response.Token);
+            await ProtectedLocalStore.SetAsync("authToken", response.Token!);
             NavigationHelper.Update();
             NavigationManager.NavigateTo("/");
         }

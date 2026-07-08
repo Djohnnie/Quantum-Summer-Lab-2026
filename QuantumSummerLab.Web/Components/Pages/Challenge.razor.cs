@@ -1,5 +1,6 @@
 using BlazorMonaco.Editor;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using QuantumSummerLab.Application.Challenges.Queries;
 using QuantumSummerLab.Application.Scores.Commands;
 using QuantumSummerLab.Application.Scores.Queries;
@@ -15,35 +16,35 @@ public partial class Challenge
     private bool? _lastLoggedIn;
 
     [Parameter]
-    public string ChallengeName { get; set; }
+    public string ChallengeName { get; set; } = string.Empty;
 
     private bool IsLoggedIn { get; set; }
-    private string TeamName { get; set; }
+    private string TeamName { get; set; } = string.Empty;
     private Guid TeamId { get; set; }
     private bool IsLoading { get; set; }
     private bool IsAvailable { get; set; }
     private bool IsSubmitting { get; set; }
-    private List<YourSubmission> YourSubmissions { get; set; }
+    private List<YourSubmission> YourSubmissions { get; set; } = new List<YourSubmission>();
     private List<VerificationFeedback> VerificationFeedback { get; set; } = new List<VerificationFeedback>();
 
-    private string Title { get; set; }
-    private string[] Description { get; set; }
-    private string Tldr { get; set; }
-    private string SolutionTemplate { get; set; }
-    private string ChallengeSolutionTemplate { get; set; }
-    private string[] ExampleDescription { get; set; }
-    private string ExampleCode { get; set; }
-    private string CopilotInstructions { get; set; }
-    private string FeedbackMessage { get; set; }
-    private string Tips { get; set; }
+    private string Title { get; set; } = string.Empty;
+    private string[] Description { get; set; } = Array.Empty<string>();
+    private string Tldr { get; set; } = string.Empty;
+    private string SolutionTemplate { get; set; } = string.Empty;
+    private string ChallengeSolutionTemplate { get; set; } = string.Empty;
+    private string[] ExampleDescription { get; set; } = Array.Empty<string>();
+    private string ExampleCode { get; set; } = string.Empty;
+    private string CopilotInstructions { get; set; } = string.Empty;
+    private string FeedbackMessage { get; set; } = string.Empty;
+    private string? Tips { get; set; }
     private bool? IsValid { get; set; }
 
-    private string Solution { get; set; }
+    private string Solution { get; set; } = string.Empty;
 
-    private StandaloneCodeEditor _editor;
+    private StandaloneCodeEditor _editor = null!;
     private bool _editorReady;
     private bool? _appliedDarkMode;
-    private string _loadedChallengeName;
+    private string? _loadedChallengeName;
 
     [CascadingParameter(Name = "IsDarkMode")]
     private bool IsDarkMode { get; set; }
@@ -58,6 +59,9 @@ public partial class Challenge
         {
             _loadedChallengeName = ChallengeName;
             IsLoading = true;
+            // Rendering the loading state unmounts the editor; the one created for
+            // the new challenge re-arms this flag through OnEditorInit.
+            _editorReady = false;
             YourSubmissions = new List<YourSubmission>();
 
             var challenge = await Mediator.Send(new GetChallengeByNameQuery { ChallengeName = ChallengeName });
@@ -96,8 +100,8 @@ public partial class Challenge
         if (_lastLoggedIn == null || _lastLoggedIn != authToken.Success)
         {
             IsLoggedIn = authToken.Success;
-            TeamName = authToken.Success ? authToken.Value.TeamName : string.Empty;
-            TeamId = authToken.Success ? authToken.Value.TeamId : Guid.Empty;
+            TeamName = authToken.Success ? authToken.Value!.TeamName : string.Empty;
+            TeamId = authToken.Success ? authToken.Value!.TeamId : Guid.Empty;
             _lastLoggedIn = authToken.Success;
 
             await LoadScore();
@@ -114,7 +118,14 @@ public partial class Challenge
 
         if (_editorReady)
         {
-            Solution = await _editor.GetValue();
+            try
+            {
+                Solution = await _editor.GetValue();
+            }
+            catch (JSException)
+            {
+                _editorReady = false;
+            }
         }
 
         var response = await Mediator.Send(new VerifyChallengeSolutionCommand
@@ -146,10 +157,7 @@ public partial class Challenge
         FeedbackMessage = "You have not yet submitted a solution";
         VerificationFeedback = new List<VerificationFeedback>();
         Tips = null;
-        if (_editorReady)
-        {
-            await _editor.SetValue(string.Empty);
-        }
+        await TrySetEditorValueAsync(string.Empty);
         StateHasChanged();
     }
 
@@ -165,10 +173,7 @@ public partial class Challenge
     protected async Task CopyCode(string code)
     {
         Solution = code ?? string.Empty;
-        if (_editorReady)
-        {
-            await _editor.SetValue(Solution);
-        }
+        await TrySetEditorValueAsync(Solution);
         StateHasChanged();
     }
 
@@ -209,10 +214,7 @@ public partial class Challenge
         }
 
         Solution = initialSolution;
-        if (_editorReady)
-        {
-            await _editor.SetValue(Solution);
-        }
+        await TrySetEditorValueAsync(Solution);
 
         StateHasChanged();
     }
@@ -249,13 +251,35 @@ public partial class Challenge
 
         if (!string.IsNullOrEmpty(Solution))
         {
-            await _editor.SetValue(Solution);
+            await TrySetEditorValueAsync(Solution);
         }
 
         // Force a render so OnAfterRenderAsync applies the theme once the editor
         // is painted. Applying the theme here (pre-paint) leaves the first editor
         // of the session showing Monaco's default light theme until re-navigation.
         StateHasChanged();
+    }
+
+    // A re-render can unmount the editor (challenge switch, login-state change,
+    // IsSuccess flipping) while a JS call to it is still in flight; BlazorMonaco
+    // then throws because its JS-side registry no longer holds the instance.
+    // Losing the call is harmless: the replacement editor applies Solution in
+    // OnEditorInit.
+    private async Task TrySetEditorValueAsync(string value)
+    {
+        if (!_editorReady)
+        {
+            return;
+        }
+
+        try
+        {
+            await _editor.SetValue(value);
+        }
+        catch (JSException)
+        {
+            _editorReady = false;
+        }
     }
 
     private async Task ApplyEditorThemeAsync()

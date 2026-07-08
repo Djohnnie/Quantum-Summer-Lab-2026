@@ -8,9 +8,9 @@ namespace QuantumSummerLab.Application.Chats.Commands;
 
 public class SaveChatCommand : IRequest<SaveChatResponse>
 {
-    public string TeamName { get; set; }
-    public string UserMessage { get; set; }
-    public string AssistantMessage { get; set; }
+    public string TeamName { get; set; } = string.Empty;
+    public string UserMessage { get; set; } = string.Empty;
+    public string AssistantMessage { get; set; } = string.Empty;
     public int TokensUsedByUser { get; set; }
     public int TokensUsedByAssistant { get; set; }
     public int ProcessingTime { get; set; }
@@ -42,7 +42,7 @@ public class SaveChatCommandHandler : IRequestHandler<SaveChatCommand, SaveChatR
             Role = "User",
             Message = request.UserMessage,
             TokensUsed = request.TokensUsedByUser,
-            Team = team,
+            Team = team!,
             Timestamp = DateTime.UtcNow,
             ProcessingTime = 0
         });
@@ -54,7 +54,7 @@ public class SaveChatCommandHandler : IRequestHandler<SaveChatCommand, SaveChatR
             Role = "Assistant",
             Message = request.AssistantMessage,
             TokensUsed = request.TokensUsedByAssistant,
-            Team = team,
+            Team = team!,
             Timestamp = DateTime.UtcNow,
             ProcessingTime = request.ProcessingTime
         });

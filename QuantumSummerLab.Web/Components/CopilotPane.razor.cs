@@ -10,7 +10,7 @@ namespace QuantumSummerLab.Web.Components;
 public partial class CopilotPane
 {
     [Parameter]
-    public string TeamName { get; set; }
+    public string TeamName { get; set; } = string.Empty;
 
     [Parameter]
     public bool ShouldAutoScroll { get; set; }
@@ -19,7 +19,7 @@ public partial class CopilotPane
     private bool _isLoading;
     private bool _alert1;
     private bool _alert2;
-    private string Chat { get; set; }
+    private string Chat { get; set; } = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

@@ -8,8 +8,8 @@ namespace QuantumSummerLab.Application.Teams.Commands;
 
 public class LoginCommand : IRequest<LoginResponse>
 {
-    public string TeamName { get; set; }
-    public string Password { get; set; }
+    public string TeamName { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }
 
 public class LoginResponse

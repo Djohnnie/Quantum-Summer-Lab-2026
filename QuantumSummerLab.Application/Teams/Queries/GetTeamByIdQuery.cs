@@ -12,7 +12,7 @@ public class GetTeamByIdQuery : IRequest<GetTeamByIdResponse>
 
 public class GetTeamByIdResponse
 {
-    public string TeamName { get; set; }
+    public string TeamName { get; set; } = string.Empty;
 }
 
 public class GetTeamByIdQueryHandler : IRequestHandler<GetTeamByIdQuery, GetTeamByIdResponse>

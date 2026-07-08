@@ -24,7 +24,7 @@ public partial class Teams
         var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
         IsLoggedIn = authToken.Success;
         AuthToken = authToken.Success ? authToken.Value : null;
-        IsAdmin = authToken.Success && authToken.Value.IsAdmin;
+        IsAdmin = authToken.Success && authToken.Value!.IsAdmin;
 
         if (IsAdmin)
         {

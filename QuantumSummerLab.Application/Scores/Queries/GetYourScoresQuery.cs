@@ -7,7 +7,7 @@ namespace QuantumSummerLab.Application.Scores.Queries;
 
 public class GetYourScoresQuery : IRequest<GetYourScoresResponse>
 {
-    public string TeamName { get; set; }
+    public string TeamName { get; set; } = string.Empty;
 }
 
 public class GetYourScoresResponse
@@ -17,7 +17,7 @@ public class GetYourScoresResponse
 
 public class ChallengeScore
 {
-    public string ChallengeName { get; set; }
+    public string ChallengeName { get; set; } = string.Empty;
     public bool IsSuccess { get; set; }
     public int TotalAttempts { get; set; }
     public int Score { get; set; }

@@ -1,20 +1,20 @@
-﻿namespace QuantumSummerLab.Data.Model;
+namespace QuantumSummerLab.Data.Model;
 
 public class Challenge
 {
     public Guid Id { get; set; }
     public int SysId { get; set; }
-    public string Name { get; set; }
-    public string Title { get; set; }
-    public string Description { get; set; }
-    public string Tldr { get; set; }
+    public string Name { get; set; } = null!;
+    public string Title { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    public string Tldr { get; set; } = null!;
     public int Level { get; set; }
-    public string ExampleCode { get; set; }
-    public string ExampleDescription { get; set; }
-    public string VerificationTemplate { get; set; }
-    public string SolutionTemplate { get; set; }
-    public string Solution { get; set; }
-    public string ExpectedOutput { get; set; }
-    public string ExpectedStates { get; set; }
-    public string CopilotInstructions { get; set; }
+    public string ExampleCode { get; set; } = null!;
+    public string ExampleDescription { get; set; } = null!;
+    public string VerificationTemplate { get; set; } = null!;
+    public string SolutionTemplate { get; set; } = null!;
+    public string Solution { get; set; } = null!;
+    public string ExpectedOutput { get; set; } = null!;
+    public string ExpectedStates { get; set; } = null!;
+    public string CopilotInstructions { get; set; } = null!;
 }

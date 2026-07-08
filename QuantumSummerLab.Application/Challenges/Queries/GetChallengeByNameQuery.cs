@@ -8,21 +8,21 @@ namespace QuantumSummerLab.Application.Challenges.Queries;
 
 public class GetChallengeByNameQuery : IRequest<GetChallengeByNameResponse>
 {
-    public string ChallengeName { get; set; }
+    public string ChallengeName { get; set; } = string.Empty;
 }
 
 public class GetChallengeByNameResponse
 {
     public bool IsAvailable { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public int Level { get; set; }
-    public string Title { get; set; }
-    public string Description { get; set; }
-    public string Tldr { get; set; }
-    public string SolutionTemplate { get; set; }
-    public string ExampleDescription { get; set; }
-    public string ExampleCode { get; set; }
-    public string CopilotInstructions { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string Tldr { get; set; } = string.Empty;
+    public string SolutionTemplate { get; set; } = string.Empty;
+    public string ExampleDescription { get; set; } = string.Empty;
+    public string ExampleCode { get; set; } = string.Empty;
+    public string CopilotInstructions { get; set; } = string.Empty;
 }
 
 public class GetChallengeByNameQueryHandler : IRequestHandler<GetChallengeByNameQuery, GetChallengeByNameResponse>

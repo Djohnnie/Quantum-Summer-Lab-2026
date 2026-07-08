@@ -7,9 +7,9 @@ public partial class Copilot
 {
     private bool? _lastLoggedIn;
     private bool IsLoggedIn { get; set; }
-    private string TeamName { get; set; }
+    private string TeamName { get; set; } = string.Empty;
 
-    private CopilotPane _copilotPane;
+    private CopilotPane? _copilotPane;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -18,7 +18,7 @@ public partial class Copilot
         if (_lastLoggedIn == null || _lastLoggedIn != authToken.Success)
         {
             IsLoggedIn = authToken.Success;
-            TeamName = authToken.Success ? authToken.Value.TeamName : string.Empty;
+            TeamName = authToken.Success ? authToken.Value!.TeamName : string.Empty;
             _lastLoggedIn = authToken.Success;
 
             StateHasChanged();

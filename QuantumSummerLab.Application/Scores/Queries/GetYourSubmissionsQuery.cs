@@ -10,8 +10,8 @@ namespace QuantumSummerLab.Application.Scores.Queries;
 
 public class GetYourSubmissionsQuery : IRequest<GetYourSubmissionsResponse>
 {
-    public string ChallengeName { get; set; }
-    public string TeamName { get; set; }
+    public string ChallengeName { get; set; } = string.Empty;
+    public string TeamName { get; set; } = string.Empty;
 }
 
 public class GetYourSubmissionsResponse
@@ -23,17 +23,17 @@ public class YourSubmission
 {
     public bool IsSuccessful { get; set; }
     public DateTime SubmissionTimestamp { get; set; }
-    public string ProposedSolution { get; set; }
-    public string Code { get; set; }
-    public string Tip { get; set; }
-    public List<SubmissionFeedback> Feedback { get; set; }
+    public string ProposedSolution { get; set; } = string.Empty;
+    public string Code { get; set; } = string.Empty;
+    public string? Tip { get; set; }
+    public List<SubmissionFeedback> Feedback { get; set; } = new List<SubmissionFeedback>();
 }
 
 public class SubmissionFeedback
 {
     public bool Valid { get; set; }
-    public string Message { get; set; }
-    public string Details { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string? Details { get; set; }
 }
 
 public class GetYourSubmissionsQueryHandler : IRequestHandler<GetYourSubmissionsQuery, GetYourSubmissionsResponse>
@@ -66,7 +66,7 @@ public class GetYourSubmissionsQueryHandler : IRequestHandler<GetYourSubmissions
 
         foreach (var score in scores)
         {
-            var feedback = string.IsNullOrEmpty(score.Feedback) ? new QSharpFeedback() : JsonSerializer.Deserialize<QSharpFeedback>(score.Feedback);
+            var feedback = string.IsNullOrEmpty(score.Feedback) ? new QSharpFeedback() : JsonSerializer.Deserialize<QSharpFeedback>(score.Feedback) ?? new QSharpFeedback();
             var code = score.ProposedSolution.FromBase64String();
 
             submissions.Add(new YourSubmission

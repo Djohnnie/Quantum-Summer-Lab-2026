@@ -6,7 +6,7 @@ namespace QuantumSummerLab.Web.Components;
 public partial class ThemedMarkdown
 {
     [Parameter]
-    public string Value { get; set; }
+    public string Value { get; set; } = string.Empty;
 
     [CascadingParameter(Name = "IsDarkMode")]
     private bool IsDarkMode { get; set; }

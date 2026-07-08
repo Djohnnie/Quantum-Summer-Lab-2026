@@ -8,9 +8,9 @@ namespace QuantumSummerLab.Application.Chats.Commands;
 
 public class ReduceChatCommand : IRequest<ReduceChatResponse>
 {
-    public string TeamName { get; set; }
-    public Guid[] ChatsToReduce { get; set; }
-    public string ReducedMessage { get; set; }
+    public string TeamName { get; set; } = string.Empty;
+    public Guid[] ChatsToReduce { get; set; } = Array.Empty<Guid>();
+    public string ReducedMessage { get; set; } = string.Empty;
     public int TokensUsed { get; set; }
 }
 
@@ -47,7 +47,7 @@ public class ReduceChatCommandHandler : IRequestHandler<ReduceChatCommand, Reduc
             Role = "Reduced",
             Message = request.ReducedMessage,
             TokensUsed = request.TokensUsed,
-            Team = team,
+            Team = team!,
             Timestamp = chatsToReduce.First().Timestamp
         });
 

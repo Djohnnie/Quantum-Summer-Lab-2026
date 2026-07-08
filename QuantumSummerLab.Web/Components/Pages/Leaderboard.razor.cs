@@ -4,9 +4,9 @@ namespace QuantumSummerLab.Web.Components.Pages;
 
 public partial class Leaderboard : IDisposable
 {
-    private List<LeaderboardEntry> Entries { get; set; }
+    private List<LeaderboardEntry> Entries { get; set; } = new List<LeaderboardEntry>();
     private string SearchString = string.Empty;
-    private PeriodicTimer RefreshTimer;
+    private PeriodicTimer RefreshTimer = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

@@ -9,8 +9,8 @@ namespace QuantumSummerLab.Application.Teams.Commands;
 
 public class RegisterCommand : IRequest<RegisterResponse>
 {
-    public string TeamName { get; set; }
-    public string Password { get; set; }
+    public string TeamName { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }
 
 public class RegisterResponse

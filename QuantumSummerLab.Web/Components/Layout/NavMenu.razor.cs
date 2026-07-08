@@ -44,11 +44,11 @@ public partial class NavMenu
         var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
 
         IsLoggedIn = authToken.Success;
-        IsAdmin = authToken.Success && authToken.Value.IsAdmin;
+        IsAdmin = authToken.Success && authToken.Value!.IsAdmin;
 
         if (IsLoggedIn)
         {
-            var teamName = authToken.Value.TeamName;
+            var teamName = authToken.Value!.TeamName;
             var result = await Mediator.Send(new GetYourScoresQuery { TeamName = teamName });
             IsChallenge0Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "0")?.IsSuccess ?? false;
             IsChallengeA1Completed = result.Scores.SingleOrDefault(x => x.ChallengeName == "A1")?.IsSuccess ?? false;

@@ -7,7 +7,7 @@ namespace QuantumSummerLab.Application.Chats.Commands;
 
 public class ClearChatCommand : IRequest<ClearChatResponse>
 {
-    public string TeamName { get; set; }
+    public string TeamName { get; set; } = string.Empty;
 }
 
 public class ClearChatResponse

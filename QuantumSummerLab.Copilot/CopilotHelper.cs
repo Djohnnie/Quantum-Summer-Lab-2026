@@ -49,7 +49,7 @@ public class CopilotHelper : ICopilotHelper, IErrorSummarizer, IFeedbackTipper
         var endpoint = _configuration["AZUREOPENAI_ENDPOINT"];
         var key = _configuration["AZUREOPENAI_KEY"];
 
-        var client = new AzureOpenAIClient(new Uri(endpoint), new ApiKeyCredential(key));
+        var client = new AzureOpenAIClient(new Uri(endpoint!), new ApiKeyCredential(key!));
         var chatClient = client.GetChatClient(deployment);
         var agentClient = chatClient.AsAIAgent(
             name: name, description: description, instructions: instructions, tools: tools, services: _serviceProvider);
@@ -80,7 +80,7 @@ public class CopilotHelper : ICopilotHelper, IErrorSummarizer, IFeedbackTipper
                 // Get the IDs of the messages to reduce.
                 var chatIds = chatHistoryCopy.Messages
                     .Where(x => x.Id.HasValue && !x.IsReduced)
-                    .Select(x => x.Id.Value).ToArray();
+                    .Select(x => x.Id!.Value).ToArray();
 
                 // Reduce the chat history by summarizing it.
                 (var reducedMessage, tokensUsedForReducing) = await Reduce(chatHistoryCopy);
@@ -444,7 +444,7 @@ public class Chat
     public bool IsReduced { get; set; }
     public bool IsDeleted { get; set; }
     public int TokensUsed { get; set; }
-    public string Header { get; set; }
+    public string Header { get; set; } = string.Empty;
 }
 
 public enum ChatRole

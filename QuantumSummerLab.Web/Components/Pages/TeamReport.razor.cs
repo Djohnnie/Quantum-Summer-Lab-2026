@@ -11,7 +11,7 @@ namespace QuantumSummerLab.Web.Components.Pages;
 public partial class TeamReport
 {
     [Parameter]
-    public string TeamId { get; set; }
+    public string TeamId { get; set; } = string.Empty;
 
     private bool IsLoading { get; set; } = true;
     private bool IsLoggedIn { get; set; }
@@ -78,7 +78,7 @@ public partial class TeamReport
 
         var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
         IsLoggedIn = authToken.Success;
-        IsAdmin = authToken.Success && authToken.Value.IsAdmin;
+        IsAdmin = authToken.Success && authToken.Value!.IsAdmin;
 
         if (!IsAdmin || authToken.Value is null)
         {
@@ -204,16 +204,16 @@ public partial class TeamReport
 
     class ChallengeGroup
     {
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         public List<ChallengeItem> Challenges { get; set; } = new List<ChallengeItem>();
     }
 
     class ChallengeItem
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string Title { get; set; } = "...";
-        public string TeamName { get; set; }
+        public string TeamName { get; set; } = string.Empty;
         public bool? IsSuccess { get; set; }
         public int TotalAttempts { get; set; }
         public int Score { get; set; }
@@ -224,7 +224,7 @@ public partial class TeamReport
     class SubmissionItem
     {
         public bool IsSuccess { get; set; }
-        public string ProposedSolution { get; set; }
+        public string ProposedSolution { get; set; } = string.Empty;
         public DateTime SubmissionTimestamp { get; set; }
 
         public List<FeedbackItem> Feedback { get; set; } = new List<FeedbackItem>();
@@ -233,7 +233,7 @@ public partial class TeamReport
     class FeedbackItem
     {
         public bool IsValid { get; set; }
-        public string Message { get; set; }
-        public string Details { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string? Details { get; set; }
     }
 }

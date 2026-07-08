@@ -10,7 +10,7 @@ namespace QuantumSummerLab.Web.Components.Pages;
 public partial class TeamChat
 {
     [Parameter]
-    public string TeamId { get; set; }
+    public string TeamId { get; set; } = string.Empty;
 
     private bool IsLoading { get; set; } = true;
     private bool IsLoggedIn { get; set; }
@@ -32,7 +32,7 @@ public partial class TeamChat
 
         var authToken = await ProtectedLocalStore.GetAsync<AuthenticationToken>("authToken");
         IsLoggedIn = authToken.Success;
-        IsAdmin = authToken.Success && authToken.Value.IsAdmin;
+        IsAdmin = authToken.Success && authToken.Value!.IsAdmin;
 
         if (!IsAdmin || authToken.Value is null)
         {

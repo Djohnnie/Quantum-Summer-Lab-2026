@@ -8,7 +8,7 @@ namespace QuantumSummerLab.Web.Components.Layout;
 
 public partial class MainLayout
 {
-    private MudThemeProvider _mudThemeProvider;
+    private MudThemeProvider _mudThemeProvider = null!;
     private bool _drawerOpen = true;
     private bool _copilotEnabled = false;
     private bool _copilotOpen = false;
@@ -17,9 +17,9 @@ public partial class MainLayout
     private bool? _lastLoggedIn;
     private bool _shouldRefreshCodeTheme;
 
-    private CopilotPane _copilotPane;
+    private CopilotPane _copilotPane = null!;
 
-    private string TeamName { get; set; }
+    private string TeamName { get; set; } = string.Empty;
 
     protected override void OnInitialized()
     {
@@ -59,7 +59,7 @@ public partial class MainLayout
 
         if (_lastLoggedIn == null || _lastLoggedIn != authToken.Success)
         {
-            TeamName = authToken.Success ? authToken.Value.TeamName : string.Empty;
+            TeamName = authToken.Success ? authToken.Value!.TeamName : string.Empty;
             _lastLoggedIn = authToken.Success;
             StateHasChanged();
         }

@@ -32,7 +32,7 @@ public class QSharpHelper : IQSharpHelper
                 };
             }
 
-            var expectedDeserializedStates = string.IsNullOrEmpty(expectedStates) ? new List<QSharpState>() : JsonSerializer.Deserialize<List<QSharpState>>(expectedStates, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var expectedDeserializedStates = string.IsNullOrEmpty(expectedStates) ? new List<QSharpState>() : JsonSerializer.Deserialize<List<QSharpState>>(expectedStates, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<QSharpState>();
 
             var qsharpSource = verificationTemplate.Replace("<<SOLVE>>", solution);
 
@@ -156,7 +156,7 @@ public class QSharpHelper : IQSharpHelper
     // The raw compiler/runtime error is passed through untouched apart from de-noising;
     // rewriting it into readable language is the job of the LLM error summarizer in
     // the Application layer.
-    private static string CleanErrorDetails(string message)
+    private static string? CleanErrorDetails(string message)
     {
         if (string.IsNullOrWhiteSpace(message))
         {
@@ -179,10 +179,10 @@ public class QSharpHelper : IQSharpHelper
 
 public class QSharpRequest
 {
-    public string VerificationTemplate { get; set; }
-    public string Solution { get; set; }
-    public string ExpectedOutput { get; set; }
-    public string ExpectedStates { get; set; }
+    public string VerificationTemplate { get; set; } = string.Empty;
+    public string Solution { get; set; } = string.Empty;
+    public string ExpectedOutput { get; set; } = string.Empty;
+    public string ExpectedStates { get; set; } = string.Empty;
 }
 
 public class QSharpFeedback
@@ -194,13 +194,13 @@ public class QSharpFeedback
 public class QSharpFeedbackMessage
 {
     public bool Valid { get; set; }
-    public string Message { get; set; }
-    public string Details { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string? Details { get; set; }
 }
 
 public class QSharpState
 {
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     public double AmplitudeReal { get; set; }
     public double AmplitudeImaginary { get; set; }
 }

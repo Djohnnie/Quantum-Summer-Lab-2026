@@ -9,7 +9,7 @@ public class ResetChallengeCommand : IRequest<ResetChallengeResponse>
 {
     public Guid RequestingTeamId { get; set; }
     public Guid TeamId { get; set; }
-    public string ChallengeName { get; set; }
+    public string ChallengeName { get; set; } = string.Empty;
 }
 
 public class ResetChallengeResponse
