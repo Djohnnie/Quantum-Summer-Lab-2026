@@ -1,0 +1,49 @@
+@* Renders a chat message sentence, showing any text wrapped in single backticks
+   (`like this`) inline in a monospace font (no extra background/border) so
+   short Q# identifiers/expressions mentioned mid-sentence are still readable,
+   without needing their own separate chat bubble. Full code snippets are
+   handled separately by ChatMessageFormatter/its own bubble. *@
+
+@foreach (var part in Parts)
+{
+    @if (part.IsCode)
+    {
+        <span class="qubit-buddy-inline-code">@part.Text</span>
+    }
+    else
+    {
+        @part.Text
+    }
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = string.Empty;
+
+    private IReadOnlyList<(string Text, bool IsCode)> Parts => Split(Text);
+
+    private static IReadOnlyList<(string Text, bool IsCode)> Split(string text)
+    {
+        var result = new List<(string, bool)>();
+
+        if (string.IsNullOrEmpty(text))
+        {
+            return result;
+        }
+
+        var segments = text.Split('`');
+
+        for (var i = 0; i < segments.Length; i++)
+        {
+            if (segments[i].Length == 0)
+            {
+                continue;
+            }
+
+            // Even segments are plain text, odd segments are inside a pair of backticks.
+            result.Add((segments[i], i % 2 == 1));
+        }
+
+        return result;
+    }
+}

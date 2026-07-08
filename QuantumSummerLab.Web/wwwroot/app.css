@@ -194,6 +194,30 @@
     border: 1px solid var(--mud-palette-lines-default);
 }
 
+/* Qubit Buddy chat: code from Qubit Buddy is always split into its own chat
+   bubble (see ChatMessageFormatter), styled with a slightly different
+   background than regular bubbles; the code text itself gets no extra
+   background/border, just a monospace font and preserved line breaks */
+.mudx-chat-bubble.qubit-buddy-code-bubble {
+    background-color: var(--mud-palette-background-grey);
+}
+
+/* Inline code mentioned mid-sentence (e.g. `H(q)`): monospace only, no extra
+   background/border so it stays visually part of the surrounding bubble */
+.qubit-buddy-inline-code {
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.qubit-buddy-code {
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 0.9em;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+}
+
 /* Markdown code blocks: clean outline + rounded corners (theme-aware,
    the highlight.js color theme itself follows dark/light in realtime) */
 .mud-markdown-body pre code.hljs {

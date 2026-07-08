@@ -33,12 +33,18 @@
 						<MudXChatHeader Name="@(message.Role == ChatRole.Assistant ? "Qubit Buddy" : "You")" Time="@message.Header" />
 					}
 
-					@foreach (var sentence in message.Content.Split("[BR]", StringSplitOptions.RemoveEmptyEntries))
+					@foreach (var segment in ChatMessageFormatter.Parse(message.Content))
 					{
-						@if (!string.IsNullOrWhiteSpace(sentence))
+						@if (segment.IsCode)
+						{
+							<MudXChatBubble Color="@(message.Role == ChatRole.Assistant ? Color.Default : Color.Info)" Class="qubit-buddy-code-bubble">
+								<pre class="qubit-buddy-code">@segment.Text</pre>
+							</MudXChatBubble>
+						}
+						else
 						{
 							<MudXChatBubble Color="@(message.Role == ChatRole.Assistant ? Color.Default : Color.Info)">
-								@sentence.Trim()
+								<InlineChatText Text="@segment.Text" />
 							</MudXChatBubble>
 						}
 					}
