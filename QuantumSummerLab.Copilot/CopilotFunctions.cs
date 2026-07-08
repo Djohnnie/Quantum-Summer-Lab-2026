@@ -71,7 +71,7 @@ public class CopilotFunctions
     }
 
     [Description("Gets the latest proposal of the current team for a specific challenge name.")]
-    [return: Description("The submitted code by the current team for the specific challenge.")]
+    [return: Description("The submitted code by the current team for the specific challenge, including the verification feedback and a tip if available.")]
     public async Task<string> GetMyLatestProposal(
         [Description("The name of the challenge to get the submitted code for.")] string challengeName,
         IServiceProvider serviceProvider)
@@ -96,6 +96,19 @@ public class CopilotFunctions
         responseBuilder.AppendLine($"**Your submission is {(latestProposal.IsSuccessful ? "correct" : "not correct")}**");
         responseBuilder.AppendLine($"**Submission**");
         responseBuilder.AppendLine(latestProposal.ProposedSolution);
+        if (latestProposal.Feedback.Count > 0)
+        {
+            responseBuilder.AppendLine($"**Feedback**");
+            foreach (var feedback in latestProposal.Feedback)
+            {
+                responseBuilder.AppendLine($"- [{(feedback.Valid ? "valid" : "invalid")}] {feedback.Message}{(string.IsNullOrEmpty(feedback.Details) ? "" : $" ({feedback.Details})")}");
+            }
+        }
+        if (!string.IsNullOrEmpty(latestProposal.Tip))
+        {
+            responseBuilder.AppendLine($"**Tip**");
+            responseBuilder.AppendLine(latestProposal.Tip);
+        }
         return responseBuilder.ToString();
     }
 
