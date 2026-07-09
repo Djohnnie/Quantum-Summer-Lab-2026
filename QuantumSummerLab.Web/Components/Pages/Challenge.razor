@@ -120,16 +120,44 @@ else if (IsAvailable)
                     </div>
                 </MudCardContent>
                 <MudCardActions>
-                    @if (IsSubmitting)
-                    {
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="true" Class="ml-2 mb-2 mr-2"><MudProgressCircular Class="ml-n2 mr-2" Indeterminate="true" Size="Size.Small" Color="Color.Default" />Submit your solution</MudButton>
-                    }
-                    else
-                    {
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="@Submit" Class="ml-2 mb-2 mr-2">Submit your solution</MudButton>
-                    }
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Secondary" OnClick="@CopyLastSubmission" Disabled="@(YourSubmissions == null || !YourSubmissions.Any())" Class="ml-2 mb-2 mr-2">Copy last submission</MudButton>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Clear" Color="Color.Error" OnClick="@Clear" Class="ml-2 mb-2">Clear</MudButton>
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                        @if (IsSubmitting)
+                        {
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="true" Class="ml-2 mb-2 mr-2"><MudProgressCircular Class="ml-n2 mr-2" Indeterminate="true" Size="Size.Small" Color="Color.Default" />Submit your solution</MudButton>
+                        }
+                        else
+                        {
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="@Submit" Class="ml-2 mb-2 mr-2">Submit your solution</MudButton>
+                        }
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ContentCopy" Color="Color.Secondary" OnClick="@CopyLastSubmission" Disabled="@(YourSubmissions == null || !YourSubmissions.Any())" Class="ml-2 mb-2 mr-2">Copy last submission</MudButton>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Clear" Color="Color.Error" OnClick="@Clear" Class="ml-2 mb-2">Clear</MudButton>
+                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.MenuBook" Color="Color.Info" Href="https://learn.microsoft.com/en-us/azure/quantum/qsharp-overview" Target="_blank" Class="ml-auto mb-2 mr-2">Q# Overview</MudButton>
+                    </MudHidden>
+                    <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true">
+                        @if (IsSubmitting)
+                        {
+                            <MudTooltip Text="Submit your solution">
+                                <MudIconButton Variant="Variant.Filled" Icon="@Icons.Material.Filled.Send" Color="Color.Primary" Disabled="true" Class="ml-2 mb-2 mr-2" />
+                            </MudTooltip>
+                        }
+                        else
+                        {
+                            <MudTooltip Text="Submit your solution">
+                                <MudIconButton Variant="Variant.Filled" Icon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="@Submit" Class="ml-2 mb-2 mr-2" />
+                            </MudTooltip>
+                        }
+                        <MudTooltip Text="Copy last submission">
+                            <MudIconButton Variant="Variant.Filled" Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Secondary" OnClick="@CopyLastSubmission" Disabled="@(YourSubmissions == null || !YourSubmissions.Any())" Class="ml-2 mb-2 mr-2" />
+                        </MudTooltip>
+                        <MudTooltip Text="Clear">
+                            <MudIconButton Variant="Variant.Filled" Icon="@Icons.Material.Filled.Clear" Color="Color.Error" OnClick="@Clear" Class="ml-2 mb-2" />
+                        </MudTooltip>
+                        <span class="ml-auto">
+                            <MudTooltip Text="Q# Overview">
+                                <MudIconButton Variant="Variant.Outlined" Icon="@Icons.Material.Filled.MenuBook" Color="Color.Info" Href="https://learn.microsoft.com/en-us/azure/quantum/qsharp-overview" Target="_blank" Class="mb-2 mr-2" />
+                            </MudTooltip>
+                        </span>
+                    </MudHidden>
                 </MudCardActions>
             </MudCard>
         }
